@@ -20,7 +20,7 @@ class Settings(BaseSettings):
 
     DB_HOST: str = "http://database-2.clyyseo20cva.us-east-2.rds.amazonaws.com/"
     DB_USER: str = "admin"
-    DB_PASSWORD: str = '12345678'
+    DB_PASSWORD: str = "12345678"
     DB_NAME: str = "skincare"
 
     SQLALCHEMY_DATABASE_URI: Optional[str] = f"mysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}"
