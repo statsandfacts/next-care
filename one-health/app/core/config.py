@@ -18,7 +18,7 @@ class Settings(BaseSettings):
     # FIRST_SUPER_ADMIN_PASSWORD: str
     # FIRST_SUPER_ADMIN_ACCOUNT_NAME: str
 
-    DB_HOST: str = "http://database-2.clyyseo20cva.us-east-2.rds.amazonaws.com/"
+    DB_HOST: str = "database-2.clyyseo20cva.us-east-2.rds.amazonaws.com"
     DB_USER: str = "admin"
     DB_PASSWORD: str = "12345678"
     DB_NAME: str = "skincare"
