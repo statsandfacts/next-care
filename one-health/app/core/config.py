@@ -18,9 +18,9 @@ class Settings(BaseSettings):
     # FIRST_SUPER_ADMIN_PASSWORD: str
     # FIRST_SUPER_ADMIN_ACCOUNT_NAME: str
 
-    DB_HOST: str = "localhost"
-    DB_USER: str = "root"
-    DB_PASSWORD: str = ""
+    DB_HOST: str = "dev-one-health.c78iwse2o1c2.us-east-2.rds.amazonaws.com"
+    DB_USER: str = "admin"
+    DB_PASSWORD: str = "12345678"
     DB_NAME: str = "skincare"
 
     SQLALCHEMY_DATABASE_URI: Optional[str] = f"mysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}"
