@@ -14,7 +14,7 @@ class UserRole(Base):
     )
     role_id = Column(
         CHAR(36),
-        ForeignKey("roles.role_id"),
+        ForeignKey("role.role_id"),
         primary_key=True,
         nullable=False,
     )

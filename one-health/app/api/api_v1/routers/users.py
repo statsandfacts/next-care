@@ -13,7 +13,7 @@ from pydantic.types import UUID4
 from sqlalchemy.orm import Session
 
 from app.schemas import UserCreate
-from app.schemas.user import UserLogin
+from app.schemas.user import UserLogin, UserLogOut
 from fastapi.responses import JSONResponse
 
 router = APIRouter(prefix="/users", tags=["users"])
@@ -85,6 +85,12 @@ def create_user(user_in: UserCreate, db: Session = Depends(get_db)
     return "user created successfully"
 
 
+@router.post("/user-logout")
+def logout_user(user_dtl: UserLogOut, db: Session = Depends(get_db)
+) -> Any:
+    response = JSONResponse(content={"message": "Logout successful"})
+    response.delete_cookie("session_token")
+    return response
 
 
 @router.put("/me", response_model=schemas.User)
@@ -170,39 +176,37 @@ def create_user_open(
 
 @router.get("/{user_id}", response_model=schemas.User)
 def read_user_by_id(
-    user_id: UUID4,
-    current_user: models.User = Security(
-        deps.get_current_active_user,
-        scopes=[Role.ADMIN["name"], Role.SUPER_ADMIN["name"]],
-    ),
+    user_id: str,
     db: Session = Depends(deps.get_db),
 ) -> Any:
     """
     Get a specific user by id.
     """
     user = crud.user.get(db, id=user_id)
+    if not user:
+        raise HTTPException(
+            status_code=404,
+            detail="The user does not exist in the system",
+        )
     return user
 
 
-@router.put("/{user_id}", response_model=schemas.User)
+@router.put("/update-user")
 def update_user(
     *,
     db: Session = Depends(deps.get_db),
-    user_id: UUID4,
-    user_in: schemas.UserUpdate,
-    current_user: models.User = Security(
-        deps.get_current_active_user,
-        scopes=[Role.ADMIN["name"], Role.SUPER_ADMIN["name"]],
-    ),
+    user_in: schemas.UserUpdate
 ) -> Any:
     """
     Update a user.
     """
-    user = crud.user.get(db, id=user_id)
+    print("dwdefregfew", user_in.user_id)
+    user = crud.user.get_by_user_id(db, user_id=user_in.user_id)
     if not user:
         raise HTTPException(
             status_code=404,
-            detail="The user with this username does not exist in the system",
+            detail="The user does not exist in the system",
         )
     user = crud.user.update(db, db_obj=user, obj_in=user_in)
-    return user
+    response = JSONResponse(content={"message": "Updated user details successfully"})
+    return response

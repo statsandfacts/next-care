@@ -1,4 +1,5 @@
 import logging
+import uuid
 from typing import Any, Dict, List, Optional, Union
 
 from sqlalchemy.exc import IntegrityError
@@ -24,6 +25,9 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
 
     def get_by_email_or_phone(self, db: Session, *, email: str, phone_number: str) -> Optional[User]:
         return db.query(self.model).filter(or_(User.email_id == email, User.phone_number == phone_number)).first()
+
+    def get_by_user_id(self, db: Session, *, user_id: str) -> Optional[User]:
+        return db.query(self.model).filter(User.user_id == user_id).first()
 
     def create(self, db: Session, *, obj_in: UserCreate) -> User:
         # db_obj = User(
@@ -86,6 +90,7 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         db_obj: User,
         obj_in: Union[UserUpdate, Dict[str, Any]],
     ) -> User:
+        updated_user = None
         if isinstance(obj_in, dict):
             update_data = obj_in
         else:
@@ -93,8 +98,16 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         if "password" in update_data:
             hashed_password = get_password_hash(update_data["password"])
             del update_data["password"]
-            update_data["hashed_password"] = hashed_password
-        return super().update(db, db_obj=db_obj, obj_in=update_data)
+            update_data["password"] = hashed_password
+            try:
+                updated_user = super().update(db, db_obj=db_obj, obj_in=update_data)
+            except IntegrityError as ie:
+                logger.error("DB error occured", exc_info=True)
+                raise HTTPException(
+                    status_code=500,
+                    detail=str(ie.orig),
+                )
+        return updated_user
 
     def get_multi(
         self, db: Session, *, skip: int = 0, limit: int = 100,

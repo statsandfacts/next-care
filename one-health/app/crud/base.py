@@ -4,6 +4,7 @@ from app.db.base import Base
 from fastapi.encoders import jsonable_encoder
 from pydantic import UUID4, BaseModel
 from sqlalchemy.orm import Session
+from sqlalchemy import or_
 
 # Define custom types for SQLAlchemy models, and Pydantic schemas
 ModelType = TypeVar("ModelType", bound=Base)
@@ -26,8 +27,13 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     ) -> List[ModelType]:
         return db.query(self.model).offset(skip).limit(limit).all()
 
-    def get(self, db: Session, id: UUID4) -> Optional[ModelType]:
-        return db.query(self.model).filter(self.model.id == id).first()
+    def get(self, db: Session, id: str) -> Optional[ModelType]:
+        print("fwfewfwe: ", id)
+        print("dwqdfewfew: ", db.query(self.model).filter(or_(self.model.user_id == id)).first())
+        return db.query(self.model).filter(or_(self.model.user_id == id)).first()
+
+    # def get(self, db: Session, id: UUID4) -> Optional[ModelType]:
+    #     return db.query(self.model).filter(self.model.user_id == id).first()
 
     def create(self, db: Session, *, obj_in: CreateSchemaType) -> ModelType:
         obj_in_data = jsonable_encoder(obj_in)

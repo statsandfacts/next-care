@@ -2,7 +2,7 @@ import datetime
 from uuid import uuid4
 
 from app.db.base_class import Base
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, String
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, String, func
 from sqlalchemy.dialects.mysql import CHAR, TIMESTAMP
 from sqlalchemy.orm import relationship
 
@@ -12,9 +12,7 @@ class User(Base):
     Database Model for an application user
     """
     __tablename__ = "user"
-    user_id = Column(
-        CHAR(36), primary_key=True, index=True, default=str(uuid4())
-    )
+    user_id = Column(CHAR(36), primary_key=True, index=True, default=uuid4)
     first_name = Column(String(255), index=True)
     last_name = Column(String(255), index=True)
     user_type = Column(String(50), index=True)
@@ -28,11 +26,14 @@ class User(Base):
 
     specialization = Column(String(255), index=True)
     is_active = Column(Boolean(), default=True)
-    created_at = Column(TIMESTAMP, default=datetime.datetime.utcnow)
+    created_at = Column(
+        TIMESTAMP(timezone=True),
+        server_default=func.now()
+    )
     updated_at = Column(
-        TIMESTAMP,
-        default=datetime.datetime.utcnow,
-        onupdate=datetime.datetime.utcnow,
+        TIMESTAMP(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now()
     )
 
 
