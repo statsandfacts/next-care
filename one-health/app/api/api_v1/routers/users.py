@@ -1,3 +1,4 @@
+import logging
 from typing import Any, List
 
 from app import crud, models, schemas
@@ -17,6 +18,8 @@ from app.schemas.user import UserLogin, UserLogOut
 from fastapi.responses import JSONResponse
 
 router = APIRouter(prefix="/users", tags=["users"])
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 @router.get("/hello")
@@ -46,27 +49,32 @@ def create_user(user_dtl: UserLogin, db: Session = Depends(get_db)
     """
     log in user.
     """
-    user = crud.user.get_by_email_or_phone(db, email=user_dtl.email_or_phone_no, phone_number=user_dtl.email_or_phone_no)
+    logger.info("email id or phone no ------> %s", user_dtl.email_or_phone_no)
+    try:
+        user = crud.user.get_by_email_or_phone(db, email=user_dtl.email_or_phone_no,
+                                               phone_number=user_dtl.email_or_phone_no)
 
-    if user:
-        if security.verify_password(user_dtl.password, user.password) is False:
+        if user:
+            if security.verify_password(user_dtl.password, user.password) is False:
+                raise HTTPException(
+                    status_code=409,
+                    detail="Please check user credentials",
+                )
+            db_user = crud.user_role.get_by_user_id(db, user_id=user.user_id)
+            if db_user.role_id != user_dtl.user_role:
+                raise HTTPException(
+                    status_code=409,
+                    detail="User role does not match",
+                )
+        else:
             raise HTTPException(
                 status_code=409,
-                detail="Please check user credentials",
+                detail="User does not exist, please sign up.",
             )
-        db_user = crud.user_role.get_by_user_id(db, user_id=user.user_id)
-        if db_user.role_id != user_dtl.user_role:
-            raise HTTPException(
-                status_code=409,
-                detail="User role does not match",
-            )
-    else:
-        raise HTTPException(
-            status_code=409,
-            detail="User does not exist, please sign up.",
-        )
 
-    return JSONResponse(content={"message": "Login successful"})
+        return JSONResponse(content={"message": "Login successful", "status": 200}, status_code=200)
+    except HTTPException as e:
+        return JSONResponse(content={"detail": str(e.detail), "status": e.status_code}, status_code=e.status_code)
 
 
 @router.post("/create-user")
@@ -75,14 +83,17 @@ def create_user(user_in: UserCreate, db: Session = Depends(get_db)
     """
     Create new user.
     """
-    user = crud.user.get_by_email(db, email=user_in.email_id)
-    if user:
-        raise HTTPException(
-            status_code=409,
-            detail="The user with this user email already exists in the system.",
-        )
-    user = crud.user.create(db, obj_in=user_in)
-    return "user created successfully"
+    try:
+        user = crud.user.get_by_email(db, email=user_in.email_id)
+        if user:
+            raise HTTPException(
+                status_code=409,
+                detail="The user with this user email already exists in the system.",
+            )
+        user = crud.user.create(db, obj_in=user_in)
+        return JSONResponse(content={"message": "User created successfully", "status": 200}, status_code=200)
+    except HTTPException as e:
+        return JSONResponse(content={"detail": str(e.detail), "status": e.status_code}, status_code=e.status_code)
 
 
 @router.post("/user-logout")
@@ -182,13 +193,16 @@ def read_user_by_id(
     """
     Get a specific user by id.
     """
-    user = crud.user.get(db, id=user_id)
-    if not user:
-        raise HTTPException(
-            status_code=404,
-            detail="The user does not exist in the system",
-        )
-    return user
+    try:
+        user = crud.user.get(db, id=user_id)
+        if not user:
+            raise HTTPException(
+                status_code=404,
+                detail="The user does not exist in the system",
+            )
+        return user
+    except HTTPException as e:
+        return JSONResponse(content={"detail": str(e.detail), "status": e.status_code}, status_code=e.status_code)
 
 
 @router.put("/update-user")
@@ -200,13 +214,17 @@ def update_user(
     """
     Update a user.
     """
-    print("dwdefregfew", user_in.user_id)
-    user = crud.user.get_by_user_id(db, user_id=user_in.user_id)
-    if not user:
-        raise HTTPException(
-            status_code=404,
-            detail="The user does not exist in the system",
-        )
-    user = crud.user.update(db, db_obj=user, obj_in=user_in)
-    response = JSONResponse(content={"message": "Updated user details successfully"})
-    return response
+    try:
+        logger.info("user id ------> %s", user_in.user_id)
+        user = crud.user.get_by_user_id(db, user_id=user_in.user_id)
+        if not user:
+            raise HTTPException(
+                status_code=404,
+                detail="The user does not exist in the system",
+            )
+        user = crud.user.update(db, db_obj=user, obj_in=user_in)
+        return JSONResponse(content={"message": "Updated user details successfully"})
+    except HTTPException as e:
+        return JSONResponse(content={"detail": str(e.detail), "status": e.status_code}, status_code=e.status_code)
+
+
