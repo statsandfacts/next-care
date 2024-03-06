@@ -223,7 +223,7 @@ def update_user(
                 detail="The user does not exist in the system",
             )
         user = crud.user.update(db, db_obj=user, obj_in=user_in)
-        return JSONResponse(content={"message": "Updated user details successfully"})
+        return JSONResponse(content={"message": "Updated user details successfully", "status": 200}, status_code=200)
     except HTTPException as e:
         return JSONResponse(content={"detail": str(e.detail), "status": e.status_code}, status_code=e.status_code)
 
