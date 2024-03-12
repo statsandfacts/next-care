@@ -7,7 +7,7 @@ from sqlalchemy.orm import relationship
 from uuid import uuid4
 
 
-class doctor(Base):
+class Doctor(Base):
     """
        Database Model for an application Doctor cases
        """

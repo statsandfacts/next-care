@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List, Dict, Any
 
 from app.schemas.user_role import UserRole
 from pydantic import UUID4, BaseModel, EmailStr
@@ -28,14 +28,17 @@ class UserCreate(UserBase):
     qualification: str
     specialization: str
 
+
 class UserLogin(UserBase):
     password: str
     email_or_phone_no: str
     user_role: str
     session_id: str
 
+
 class UserLogOut(UserBase):
     user_id: str
+
 
 # Properties to receive via API on update
 class UserUpdate(UserBase):
@@ -50,12 +53,14 @@ class UserUpdate(UserBase):
 
 class UserInDBBase(UserBase):
     user_id: UUID4
-    #user_role: Optional[UserRole]
-    created_at: datetime
-    updated_at: datetime
-    address: str
-    qualification: str
-    specialization: str
+    # user_role: Optional[UserRole]
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
+    address: str | None = None
+    qualification: str | None = None
+    specialization: str | None = None
+    status: str | None = None
+    doctor_user_id: str | None = None
 
     class Config:
         orm_mode = True
@@ -69,3 +74,11 @@ class User(UserInDBBase):
 # Additional properties stored in DB
 class UserInDB(UserInDBBase):
     hashed_password: str
+
+
+class PaginatedItemList(BaseModel):
+    total: int
+    items: List[User]
+    #items: List[Dict[str, Any]]
+    skip: int
+    limit: int

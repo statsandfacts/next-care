@@ -3,8 +3,9 @@ from typing import Any, Dict, Generic, List, Optional, Type, TypeVar, Union
 from app.db.base import Base
 from fastapi.encoders import jsonable_encoder
 from pydantic import UUID4, BaseModel
-from sqlalchemy.orm import Session
-from sqlalchemy import or_
+from sqlalchemy.orm import Session, aliased, joinedload
+from sqlalchemy import or_, literal, not_, select, Column, String
+from app.models import User, Doctor
 
 # Define custom types for SQLAlchemy models, and Pydantic schemas
 ModelType = TypeVar("ModelType", bound=Base)
@@ -68,3 +69,66 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         db.delete(obj)
         db.commit()
         return obj
+
+    # def get_items(self, db: Session, skip: int = 0, limit: int = 10) -> ModelType:
+    #     """
+    #     Retrieve paginated items from the database.
+    #
+    #     :param db: SQLAlchemy database session
+    #     :param skip: Number of items to skip
+    #     :param limit: Maximum number of items to return per page
+    #     :return: List of paginated items
+    #     """
+    #     print("fdsf: ", type(db.query(self.model).offset(skip).limit(limit).all()))
+    #     return db.query(self.model).offset(skip).limit(limit).all()
+
+    def get_items(self, db: Session,status: int,  skip: int = 0, limit: int = 10) -> List[Dict]:
+        """
+        Retrieve paginated items from the database.
+
+        :param db: SQLAlchemy database session
+        :param skip: Number of items to skip
+        :param limit: Maximum number of items to return per page
+        :return: List of paginated items
+        """
+        if status == 0:
+            query = db.query(User).outerjoin(Doctor, User.user_id == Doctor.patient_user_id).filter(User.user_type == "Patient")
+
+            # Filter the results to include only those users not present in the Doctor table
+            query = query.filter(or_(Doctor.patient_user_id == None, literal(False)))
+
+            query = query.offset(skip).limit(limit)
+            items = query.all()
+        elif status == 1:
+            # query = db.query(User).join(Doctor, User.user_id == Doctor.patient_user_id).filter(User.user_type == "Patient")
+            # # Apply offset and limit for pagination
+            # query = query.offset(skip).limit(limit)
+
+            query = (
+                db.query(User, Doctor.doctor_user_id, Doctor.status)
+                .join(Doctor, User.user_id == Doctor.patient_user_id)
+                .filter(User.user_type == "Patient")
+                .offset(skip)
+                .limit(limit)
+            )
+
+            # Execute the query and fetch the results
+            items = query.all()
+            item_dicts = [
+                {
+                    "user_id": user.user_id,
+                    "first_name": user.first_name,
+                    "last_name": user.last_name,
+                    # Add more fields as needed
+                    "doctor_user_id": doctor_user_id,
+                    "status": status
+                }
+                for user, doctor_user_id, status in items
+            ]
+            return item_dicts
+        else:
+            items = db.query(self.model).filter(User.user_type == "Patient").offset(skip).limit(limit).all()
+
+        # Convert each item to a dictionary representation
+        item_dicts = [item.__dict__ for item in items]
+        return item_dicts

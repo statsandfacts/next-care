@@ -7,14 +7,14 @@ from app.api.deps import get_db
 from app.constants.role import Role
 from app.core.config import settings
 from app.core import security
-from fastapi import APIRouter, Body, Depends, HTTPException, Security
+from fastapi import APIRouter, Body, Depends, HTTPException, Security, Query
 from fastapi.encoders import jsonable_encoder
 from pydantic.networks import EmailStr
 from pydantic.types import UUID4
 from sqlalchemy.orm import Session
 
 from app.schemas import UserCreate
-from app.schemas.user import UserLogin, UserLogOut
+from app.schemas.user import UserLogin, UserLogOut, PaginatedItemList
 from fastapi.responses import JSONResponse
 
 router = APIRouter(prefix="/users", tags=["users"])
@@ -72,7 +72,7 @@ def create_user(user_dtl: UserLogin, db: Session = Depends(get_db)
                 detail="User does not exist, please sign up.",
             )
 
-        return JSONResponse(content={"message": "Login successful", "status": 200}, status_code=200)
+        return JSONResponse(content={"message": "Login successful", "status": 200, "user_id": user.user_id}, status_code=200)
     except HTTPException as e:
         return JSONResponse(content={"detail": str(e.detail), "status": e.status_code}, status_code=e.status_code)
 
@@ -226,5 +226,27 @@ def update_user(
         return JSONResponse(content={"message": "Updated user details successfully", "status": 200}, status_code=200)
     except HTTPException as e:
         return JSONResponse(content={"detail": str(e.detail), "status": e.status_code}, status_code=e.status_code)
+
+
+@router.get("/items/", response_model=PaginatedItemList)
+def get_items(
+        status: int,
+        db: Session = Depends(get_db),
+        page: int = Query(default=1, ge=1),
+        limit: int = Query(default=10, ge=1),
+):
+    # Calculate skip value based on page number and page size
+    skip = (page - 1) * limit
+
+    # Retrieve paginated items from the database
+    items = crud.user.get_items(db, status=status, skip=skip, limit=limit)
+
+    # Return paginated items along with metadata
+    return PaginatedItemList(
+        total=len(items),
+        items=items,
+        skip=skip,
+        limit=limit,
+    )
 
 

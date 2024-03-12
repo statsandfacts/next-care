@@ -14,9 +14,9 @@ from pydantic.types import UUID4
 from sqlalchemy.orm import Session
 from sqlalchemy import or_
 
-
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
 
 class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
 
@@ -61,7 +61,7 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
             db.refresh(db_obj)
         except IntegrityError as ie:
             logger.error("DB error occured", exc_info=True)
-            print("dwqdwqdwqd",ie.detail)
+            print("dwqdwqdwqd", ie.detail)
             raise HTTPException(
                 status_code=500,
                 detail=str(ie.orig),
@@ -76,7 +76,7 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         return db_obj
 
     def assign_roles(self, db_obj):
-        if db_obj.user_type.casefold() == "customer":
+        if db_obj.user_type.casefold() == "patient":
             return "1"
         elif db_obj.user_type.casefold() == "doctor":
             return "2"
@@ -84,11 +84,11 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
             return "3"
 
     def update(
-        self,
-        db: Session,
-        *,
-        db_obj: User,
-        obj_in: Union[UserUpdate, Dict[str, Any]],
+            self,
+            db: Session,
+            *,
+            db_obj: User,
+            obj_in: Union[UserUpdate, Dict[str, Any]],
     ) -> User:
         updated_user = None
         if isinstance(obj_in, dict):
@@ -110,12 +110,12 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         return updated_user
 
     def get_multi(
-        self, db: Session, *, skip: int = 0, limit: int = 100,
+            self, db: Session, *, skip: int = 0, limit: int = 100,
     ) -> List[User]:
         return db.query(self.model).offset(skip).limit(limit).all()
 
     def authenticate(
-        self, db: Session, *, email: str, password: str
+            self, db: Session, *, email: str, password: str
     ) -> Optional[User]:
         user = self.get_by_email(db, email=email)
         if not user:
@@ -128,12 +128,12 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         return user.is_active
 
     def get_by_account_id(
-        self,
-        db: Session,
-        *,
-        account_id: UUID4,
-        skip: int = 0,
-        limit: int = 100,
+            self,
+            db: Session,
+            *,
+            account_id: UUID4,
+            skip: int = 0,
+            limit: int = 100,
     ) -> List[User]:
         return (
             db.query(self.model)
@@ -142,6 +142,18 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
             .limit(limit)
             .all()
         )
+
+
+def get_items(self, db: Session, skip: int = 0, limit: int = 10) -> User:
+    """
+    Retrieve paginated items from the database.
+
+    :param db: SQLAlchemy database session
+    :param skip: Number of items to skip
+    :param limit: Maximum number of items to return per page
+    :return: List of paginated items
+    """
+    return db.query(self.model).offset(skip).limit(limit).all()
 
 
 user = CRUDUser(User)
