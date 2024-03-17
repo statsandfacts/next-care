@@ -82,3 +82,21 @@ class PaginatedItemList(BaseModel):
     #items: List[Dict[str, Any]]
     skip: int
     limit: int
+
+
+class CaseCreate(BaseModel):
+    pass
+
+
+class CaseUpdate(BaseModel):
+    doctor_user_id: str
+    patient_user_id: str
+    insights: str
+    status: bool
+    case_id: str
+
+class PaginatedItemDoctorList(BaseModel):
+    total: int
+    items: List[CaseUpdate]
+    skip: int
+    limit: int

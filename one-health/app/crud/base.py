@@ -24,7 +24,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         self.model = model
 
     def get_multi(
-        self, db: Session, *, skip: int = 0, limit: int = 100
+            self, db: Session, *, skip: int = 0, limit: int = 100
     ) -> List[ModelType]:
         return db.query(self.model).offset(skip).limit(limit).all()
 
@@ -45,11 +45,11 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         return db_obj
 
     def update(
-        self,
-        db: Session,
-        *,
-        db_obj: ModelType,
-        obj_in: Union[UpdateSchemaType, Dict[str, Any]]
+            self,
+            db: Session,
+            *,
+            db_obj: ModelType,
+            obj_in: Union[UpdateSchemaType, Dict[str, Any]]
     ) -> ModelType:
         obj_data = jsonable_encoder(db_obj)
         if isinstance(obj_in, dict):
@@ -82,7 +82,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     #     print("fdsf: ", type(db.query(self.model).offset(skip).limit(limit).all()))
     #     return db.query(self.model).offset(skip).limit(limit).all()
 
-    def get_items(self, db: Session,status: int,  skip: int = 0, limit: int = 10) -> List[Dict]:
+    def get_items(self, db: Session, status: int, skip: int = 0, limit: int = 10) -> List[Dict]:
         """
         Retrieve paginated items from the database.
 
@@ -92,7 +92,8 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         :return: List of paginated items
         """
         if status == 0:
-            query = db.query(User).outerjoin(Doctor, User.user_id == Doctor.patient_user_id).filter(User.user_type == "Patient")
+            query = db.query(User).outerjoin(Doctor, User.user_id == Doctor.patient_user_id).filter(
+                User.user_type == "Patient")
 
             # Filter the results to include only those users not present in the Doctor table
             query = query.filter(or_(Doctor.patient_user_id == None, literal(False)))

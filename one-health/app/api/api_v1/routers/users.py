@@ -12,9 +12,10 @@ from fastapi.encoders import jsonable_encoder
 from pydantic.networks import EmailStr
 from pydantic.types import UUID4
 from sqlalchemy.orm import Session
+from app.models.doctor import Doctor
 
 from app.schemas import UserCreate
-from app.schemas.user import UserLogin, UserLogOut, PaginatedItemList
+from app.schemas.user import UserLogin, UserLogOut, PaginatedItemList, PaginatedItemDoctorList
 from fastapi.responses import JSONResponse
 
 router = APIRouter(prefix="/users", tags=["users"])
@@ -185,7 +186,7 @@ def create_user_open(
     return user
 
 
-@router.get("/{user_id}", response_model=schemas.User)
+@router.get("get-user/{user_id}", response_model=schemas.User)
 def read_user_by_id(
     user_id: str,
     db: Session = Depends(deps.get_db),
@@ -249,4 +250,25 @@ def get_items(
         limit=limit,
     )
 
+@router.get("/doctor-list", response_model=PaginatedItemDoctorList)
+def get_doctor_list(doctor_user_id: str,
+        status: int,
+        db: Session = Depends(get_db),
+        page: int = Query(default=1, ge=1),
+        limit: int = Query(default=10, ge=1)
+):
+    # user = db.query(Doctor).filter(Doctor.doctor_user_id == doctor_user_id).first()
+    # if not user:
+    #     raise HTTPException(
+    #         status_code=404,
+    #         detail="The doctor is not assigned to any cases based on the filter criteria",
+    #     )
+    skip = (page - 1) * limit
+    items = crud.case.get_doctor_list(db, status=status, doctor_user_id= doctor_user_id, skip=skip, limit=limit)
 
+    return PaginatedItemDoctorList(
+        total=len(items),
+        items=items,
+        skip=skip,
+        limit=limit,
+    )

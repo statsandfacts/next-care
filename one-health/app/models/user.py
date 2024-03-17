@@ -7,7 +7,7 @@ from sqlalchemy.dialects.mysql import CHAR, TIMESTAMP
 from sqlalchemy.orm import relationship
 
 
-class User(Base):
+class  User(Base):
     """
     Database Model for an application user
     """
@@ -43,4 +43,10 @@ class User(Base):
         back_populates="user",
         primaryjoin="User.user_id == UserRole.user_id",
         uselist=False
+    )
+
+    user_upload = relationship(
+        "UserUpload",
+        back_populates="user",
+        primaryjoin="User.user_id == UserUpload.user_id"
     )

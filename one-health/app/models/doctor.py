@@ -13,6 +13,7 @@ class Doctor(Base):
        """
     __tablename__ = "Doctor"
     case_id = Column(CHAR(36), primary_key=True, index=True, default=uuid4)
+    sec_case_id = Column(CHAR(36), index=True, default=uuid4)
     doctor_user_id = Column(String(255), index=True)
     patient_user_id = Column(String(255), index=True)
     insights = Column(String(255), index=True)
