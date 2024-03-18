@@ -186,7 +186,7 @@ def create_user_open(
     return user
 
 
-@router.get("get-user/{user_id}", response_model=schemas.User)
+@router.get("/get-user", response_model=schemas.User)
 def read_user_by_id(
     user_id: str,
     db: Session = Depends(deps.get_db),
