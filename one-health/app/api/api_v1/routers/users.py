@@ -92,7 +92,7 @@ def create_user(user_in: UserCreate, db: Session = Depends(get_db)
                 detail="The user with this user email already exists in the system.",
             )
         user = crud.user.create(db, obj_in=user_in)
-        return JSONResponse(content={"message": "User created successfully", "status": 200}, status_code=200)
+        return JSONResponse(content={"message": "User created successfully", "status": 200, "user_id": user.user_id}, status_code=200)
     except HTTPException as e:
         return JSONResponse(content={"detail": str(e.detail), "status": e.status_code}, status_code=e.status_code)
 
