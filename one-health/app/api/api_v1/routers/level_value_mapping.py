@@ -24,6 +24,7 @@ def view_key_criteria():
     # Fetch all key criteria
     mycursor.execute("SELECT * FROM level_value_mapping")
     result = mycursor.fetchall()
+    print("cdcewew, ", result)
     if not result:
         raise HTTPException(status_code=404, detail="No key criteria found")
     return {"key_criteria": result}
