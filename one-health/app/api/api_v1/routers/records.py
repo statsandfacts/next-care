@@ -81,9 +81,9 @@ async def delete_records(key_combination: str):
     return {"message": f"Records with key_combination '{key_combination}' deleted successfully"}
 
 # Show records endpoint based on key_combination
-@router.get("/show_records/{key_combination}")
+@router.get("/show_records")
 async def show_records(key_combination: str):
-    sql = "SELECT * FROM your_table WHERE KEY_COMBINATION = %s"
+    sql = "SELECT * FROM Question_sequence_layout WHERE KEY_COMBINATION = %s"
     val = (key_combination,)
     
     mycursor.execute(sql, val)
