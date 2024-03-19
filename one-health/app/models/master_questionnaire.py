@@ -10,3 +10,6 @@ class MasterQuestionnaireCreate(BaseModel):
     question_type: str
     description: str
     multiple_selection_allowed: bool
+
+class MasterQuestionnareDetail(BaseModel):
+    question_ids: list[str]
