@@ -3,6 +3,7 @@ from typing import Optional, List, Dict, Any
 
 from app.schemas.user_role import UserRole
 from pydantic import UUID4, BaseModel, EmailStr
+from sqlalchemy import JSON
 
 
 # Shared properties
@@ -79,7 +80,7 @@ class UserInDB(UserInDBBase):
 class PaginatedItemList(BaseModel):
     total: int
     items: List[User]
-    #items: List[Dict[str, Any]]
+    # items: List[Dict[str, Any]]
     skip: int
     limit: int
 
@@ -95,8 +96,19 @@ class CaseUpdate(BaseModel):
     status: bool
     case_id: str
 
+
 class PaginatedItemDoctorList(BaseModel):
     total: int
     items: List[CaseUpdate]
     skip: int
     limit: int
+
+
+class SaveUserResponse(BaseModel):
+    session_id: str
+    user_id: str
+    question_answers: List[Dict[str, Optional[str]]] | None = None
+
+
+class GetUserResponse(BaseModel):
+    question_answers: List[Dict[str, Optional[str]]]

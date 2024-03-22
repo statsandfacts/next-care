@@ -1,4 +1,4 @@
-import logging
+import logging, json
 from typing import Any, List
 
 from app import crud, models, schemas
@@ -15,7 +15,7 @@ from sqlalchemy.orm import Session
 from app.models.doctor import Doctor
 
 from app.schemas import UserCreate
-from app.schemas.user import UserLogin, UserLogOut, PaginatedItemList, PaginatedItemDoctorList
+from app.schemas.user import UserLogin, UserLogOut, PaginatedItemList, PaginatedItemDoctorList, SaveUserResponse, GetUserResponse
 from fastapi.responses import JSONResponse
 
 router = APIRouter(prefix="/users", tags=["users"])
@@ -45,7 +45,7 @@ def read_users(
     return users
 
 @router.post("/user-login")
-def create_user(user_dtl: UserLogin, db: Session = Depends(get_db)
+def user_login(user_dtl: UserLogin, db: Session = Depends(get_db)
 ) -> Any:
     """
     log in user.
@@ -72,7 +72,8 @@ def create_user(user_dtl: UserLogin, db: Session = Depends(get_db)
                 status_code=409,
                 detail="User does not exist, please sign up.",
             )
-
+        #save user session
+        crud.user_session.createOrUpdateSession(db, session_id=user_dtl.session_id, user_id=user.user_id)
         return JSONResponse(content={"message": "Login successful", "status": 200, "user_id": user.user_id}, status_code=200)
     except HTTPException as e:
         return JSONResponse(content={"detail": str(e.detail), "status": e.status_code}, status_code=e.status_code)
@@ -272,3 +273,41 @@ def get_doctor_list(doctor_user_id: str,
         skip=skip,
         limit=limit,
     )
+
+@router.get("/get-user-responses", response_model=GetUserResponse)
+def get_user_response(session_id: str,
+        user_id: str,
+        db: Session = Depends(get_db)):
+    try:
+        user_session = crud.user_session.get_by_session_id(db, session_id=session_id,
+                                                           user_id=user_id)
+        if not user_session:
+            raise HTTPException(
+                status_code=404,
+                detail="The session or user does not exist in the system",
+            )
+        return GetUserResponse(question_answers=user_session.question_answers)
+    except HTTPException as e:
+        return JSONResponse(content={"detail": str(e.detail), "status": e.status_code}, status_code=e.status_code)
+
+
+@router.post("/save-user-questionnaire")
+def save_user_response(user_response : SaveUserResponse, db: Session = Depends(get_db)
+) -> Any:
+    try:
+        user_session = crud.user_session.get_by_session_id(db, session_id=user_response.session_id,
+                                                           user_id=user_response.user_id)
+        if not user_session:
+            raise HTTPException(
+                status_code=404,
+                detail="The session or user does not exist in the system",
+            )
+        # Extract question_answers
+        question_answers = user_response.question_answers
+        print("qs 1: ", question_answers)
+        user_session.question_answers = question_answers
+        crud.user_session.update_user_session(db, db_obj=user_session, obj_in=user_response)
+        return JSONResponse(content={"message": "User responses captured successfully", "status": 200}, status_code=200)
+    except HTTPException as e:
+        return JSONResponse(content={"detail": str(e.detail), "status": e.status_code}, status_code=e.status_code)
+

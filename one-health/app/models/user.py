@@ -23,7 +23,8 @@ class  User(Base):
     password = Column(String(255), nullable=False)
     address = Column(String(255), index=True)
     qualification = Column(String(255), index=True)
-
+    # gender = Column(String(50), index=True)
+    # dob = Column(String(50), index=True)
     specialization = Column(String(255), index=True)
     is_active = Column(Boolean(), default=True)
     created_at = Column(
