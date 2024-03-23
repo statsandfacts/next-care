@@ -5,6 +5,8 @@ from app.database.engine import mycursor, mydb
 from fastapi import HTTPException
 from typing import List
 
+from starlette.responses import JSONResponse
+
 router = APIRouter(prefix="/master_questionnaire", tags=["questions"])
 
 @router.post("/add_questionnaire/")
@@ -24,7 +26,8 @@ def add_questionnaire(master_questionnaire: MasterQuestionnaireCreate, question_
         mycursor.execute(sql, val)
         mydb.commit()
 
-    return {"message": "Questionnaire added successfully"}
+    #return {"message": "Questionnaire added successfully"}
+    return JSONResponse(content={"message": "Questionnaire added successfully", "status": 200}, status_code=200)
 
 @router.get("/get_questionnaires/")
 def get_questionnaires():
@@ -46,7 +49,8 @@ def get_questionnaires():
         
         questionnaires.append({"master_questionnaire": master_questionnaire.dict(), "question_values": [qv.dict() for qv in question_values]})
     
-    return questionnaires
+    #return questionnaires
+    return JSONResponse(content={"questionnaires": questionnaires, "status": 200}, status_code=200)
 
 
 @router.put("/update_questionnaire/{question_id}")
@@ -76,7 +80,8 @@ def update_questionnaire(question_id: int, master_questionnaire: MasterQuestionn
         mycursor.execute(sql, val)
         mydb.commit()
 
-    return {"message": f"Questionnaire with ID {question_id} updated successfully"}
+    #return {"message": f"Questionnaire with ID {question_id} updated successfully"}
+    return JSONResponse(content={"message": f"Questionnaire with ID {question_id} updated successfully", "status": 200}, status_code=200)
 
 @router.delete("/delete_questionnaire/{question_id}")
 def delete_questionnaire(question_id: int):
@@ -92,7 +97,8 @@ def delete_questionnaire(question_id: int):
     mycursor.execute(sql, val)
     mydb.commit()
 
-    return {"message": f"Questionnaire with ID {question_id} deleted successfully"}
+    #return {"message": f"Questionnaire with ID {question_id} deleted successfully"}
+    return JSONResponse(content={"message": f"Questionnaire with ID {question_id} deleted successfully", "status": 200}, status_code=200)
 
 
 @router.post("/show_question_details")
@@ -101,11 +107,13 @@ def show_question_details(master_questionnaire: MasterQuestionnareDetail):
     for question_id in master_questionnaire.question_ids:
         try:
             # Fetch question details
-            mycursor.execute("SELECT question_id, question_type FROM master_questionnaire WHERE question_id = %s", (question_id,))
+            mycursor.execute("SELECT question_id, question_type, multiple_selection_allowed FROM master_questionnaire "
+                             "WHERE question_id = %s", (question_id,))
             question_data = mycursor.fetchone()
 
             if question_data:
                 question_type = question_data[1]
+                multiple_val_allowed = question_data[2]
 
                 # Fetch allowed values
                 mycursor.execute("SELECT allowed_values FROM question_values WHERE question_id = %s", (question_id,))
@@ -115,7 +123,8 @@ def show_question_details(master_questionnaire: MasterQuestionnareDetail):
                 question_details.append({
                     "question_id": question_data[0],
                     "question_type": question_type,
-                    "allowed_values": allowed_values
+                    "allowed_values": allowed_values,
+                    "multiple_val_allowed": multiple_val_allowed
                 })
             else:
                 question_details.append({
@@ -127,4 +136,5 @@ def show_question_details(master_questionnaire: MasterQuestionnareDetail):
             # Log the exception if necessary
             print(f"Error processing question ID {question_id}: {e}")
 
-    return question_details
+    #return question_details
+    return JSONResponse(content={"question_details": question_details, "status": 200}, status_code=200)

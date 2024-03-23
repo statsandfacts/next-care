@@ -4,6 +4,8 @@ from app.database.engine import mycursor, mydb
 from typing import List
 import hashlib
 
+from starlette.responses import JSONResponse
+
 router = APIRouter(prefix="/records", tags=["questions"])
 
 @router.post("/create_records/")
@@ -67,7 +69,8 @@ async def update_records(key_combination: str, QuestionSequenceLayout: QuestionS
             mycursor.execute(sql, val)
             mydb.commit()
     
-    return {"message": f"Records with key_combination '{key_combination}' updated successfully"}
+    #return {"message": f"Records with key_combination '{key_combination}' updated successfully"}
+    return JSONResponse(content={"message": f"Records with key_combination '{key_combination}' updated successfully", "status": 200}, status_code=200)
 
 # Delete records endpoint
 @router.delete("/delete_records/{key_combination}")
@@ -78,7 +81,9 @@ async def delete_records(key_combination: str):
     mycursor.execute(sql, val)
     mydb.commit()
     
-    return {"message": f"Records with key_combination '{key_combination}' deleted successfully"}
+    #return {"message": f"Records with key_combination '{key_combination}' deleted successfully"}
+    return JSONResponse(
+        content={"message": f"Records with key_combination '{key_combination}' deleted successfully", "status": 200}, status_code=200)
 
 # Show records endpoint based on key_combination
 @router.get("/show_records")
@@ -92,4 +97,5 @@ async def show_records(key_combination: str):
     if not records:
         raise HTTPException(status_code=404, detail=f"No records found with key_combination '{key_combination}'")
     
-    return records
+    #return records
+    return JSONResponse(content={"records": records, "status": 200}, status_code=200)

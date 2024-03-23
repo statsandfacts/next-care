@@ -3,6 +3,8 @@ from app.models.level_value_mapping import LevelValueMapping
 from app.database.engine import mycursor, mydb
 from typing import List
 
+from starlette.responses import JSONResponse
+
 router = APIRouter(prefix="/level_value_mapping", tags=["questions"])
 
 @router.post("/add_key_criteria/")
@@ -17,7 +19,8 @@ def add_key_criteria(mapping: LevelValueMapping):
         mycursor.execute(sql, val)
         mydb.commit()
     
-    return {"message": "Key criteria added successfully"}
+    #return {"message": "Key criteria added successfully"}
+    return JSONResponse(content={"message": "Key criteria added successfully", "status": 200}, status_code=200)
 
 @router.get("/view_key_criteria/")
 def view_key_criteria():
@@ -27,7 +30,8 @@ def view_key_criteria():
     print("cdcewew, ", result)
     if not result:
         raise HTTPException(status_code=404, detail="No key criteria found")
-    return {"key_criteria": result}
+    #return {"key_criteria": result}
+    return JSONResponse(content={"key_criteria": result, "status": 200}, status_code=200)
 
 @router.put("/update_key_criteria/{level_id}")
 def update_key_criteria(level_id: str, mapping: LevelValueMapping):
@@ -44,7 +48,8 @@ def update_key_criteria(level_id: str, mapping: LevelValueMapping):
         mycursor.execute(insert_sql, insert_val)
         mydb.commit()
 
-    return {"message": f"Key criteria with ID {level_id} updated successfully"}
+    #return {"message": f"Key criteria with ID {level_id} updated successfully"}
+    return JSONResponse(content={"message": f"Key criteria with ID {level_id} updated successfully", "status": 200}, status_code=200)
 
 @router.delete("/delete_key_criteria/{level_id}")
 def delete_key_criteria(level_id: str):
@@ -54,4 +59,5 @@ def delete_key_criteria(level_id: str):
     mydb.commit()
     if mycursor.rowcount == 0:
         raise HTTPException(status_code=404, detail="Key criteria not found")
-    return {"message": f"Key criteria with ID {level_id} deleted successfully"}
+    #return {"message": f"Key criteria with ID {level_id} deleted successfully"}
+    return JSONResponse(content={"message": f"Key criteria with ID {level_id} deleted successfully", "status": 200}, status_code=200)
