@@ -28,6 +28,8 @@ class UserCreate(UserBase):
     address: str
     qualification: str
     specialization: str
+    gender: str
+    dob: str
 
 
 class UserLogin(UserBase):
