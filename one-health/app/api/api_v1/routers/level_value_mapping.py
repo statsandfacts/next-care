@@ -30,8 +30,24 @@ def view_key_criteria():
     print("cdcewew, ", result)
     if not result:
         raise HTTPException(status_code=404, detail="No key criteria found")
+
+    # Create a dictionary to store grouped elements
+    grouped_data = {}
+
+    # Iterate over the list and group elements
+    for item in result:
+        key = (item[0], item[1])  # Create a key based on first and second indices
+        if key in grouped_data:
+            # Concatenate third index value to existing value
+            grouped_data[key] += f", {item[2]}"
+        else:
+            grouped_data[key] = item[2]  # Store third index value
+
+    # Convert dictionary items to list of tuples
+    grouped_list = [(key[0], key[1], value) for key, value in grouped_data.items()]
+
     #return {"key_criteria": result}
-    return JSONResponse(content={"key_criteria": result, "status": 200}, status_code=200)
+    return JSONResponse(content={"key_criteria": grouped_list, "status": 200}, status_code=200)
 
 @router.put("/update_key_criteria/{level_id}")
 def update_key_criteria(level_id: str, mapping: LevelValueMapping):
