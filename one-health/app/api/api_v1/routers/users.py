@@ -229,7 +229,6 @@ def update_user(
     except HTTPException as e:
         return JSONResponse(content={"detail": str(e.detail), "status": e.status_code}, status_code=e.status_code)
 
-
 @router.get("/items/", response_model=PaginatedItemList)
 def get_items(
         status: int,
@@ -265,7 +264,7 @@ def get_doctor_list(doctor_user_id: str,
     #         detail="The doctor is not assigned to any cases based on the filter criteria",
     #     )
     skip = (page - 1) * limit
-    items = crud.case.get_doctor_list(db, status=status, doctor_user_id= doctor_user_id, skip=skip, limit=limit)
+    items = crud.casez.get_doctor_list(db, status=status, doctor_user_id= doctor_user_id, skip=skip, limit=limit)
 
     return PaginatedItemDoctorList(
         total=len(items),
@@ -310,4 +309,7 @@ def save_user_response(user_response : SaveUserResponse, db: Session = Depends(g
         return JSONResponse(content={"message": "User responses captured successfully", "status": 200}, status_code=200)
     except HTTPException as e:
         return JSONResponse(content={"detail": str(e.detail), "status": e.status_code}, status_code=e.status_code)
+
+
+
 

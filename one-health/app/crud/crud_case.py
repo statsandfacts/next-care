@@ -71,8 +71,8 @@ class CRUDCase(CRUDBase[Doctor, CaseCreate, CaseUpdate]):
 
     def get_doctor_list(self, db: Session, status: int, doctor_user_id: str, skip: int = 0, limit: int = 10) -> List[
         Dict]:
-        case_items = None
-        print("doc id: ", type(doctor_user_id))
+        case_items = []
+        print("doc id: ", doctor_user_id)
         if not doctor_user_id:
             case_items = db.query(self.model).filter(or_(self.model.status == status)).all()
             print("if case items", case_items)
@@ -86,27 +86,34 @@ class CRUDCase(CRUDBase[Doctor, CaseCreate, CaseUpdate]):
         user_ids = [obj.patient_user_id for obj in case_items]
         print("user ids: ", user_ids)
         # image_path_items = db.query(UserUpload).filter(UserUpload.user_id.in_(user_ids)).all()
-        image_path_items = db.query(UserUpload). \
-            filter(UserUpload.user_id.in_(user_ids)). \
-            filter(func.DATE(UserUpload.created_at) == func.DATE(case_items[0].created_at)). \
-            all()
+        image_path_items = []
+        if len(case_items) > 0:
+            image_path_items = db.query(UserUpload). \
+                filter(UserUpload.user_id.in_(user_ids)). \
+                filter(func.DATE(UserUpload.created_at) == func.DATE(case_items[0].created_at)). \
+                all()
+            print("image_path_items: ", image_path_items[0].user_id)
+            print("case_item.patient_user_id: ", case_items[0].patient_user_id)
 
-        item_dicts = [
-            {
-                "case_id": case_item.case_id,
-                "doctor_user_id": case_item.doctor_user_id,
-                "patient_user_id": case_item.patient_user_id,
-                # Add more fields as needed
-                "status": case_item.status,
-                "insights":case_item.insights,
-                "created_at": case_item.created_at,
-                "image_path": image_path_item.image_path
-            }
-            for case_item, image_path_item in zip(case_items, image_path_items)
-            if case_item.patient_user_id == image_path_item.user_id
-        ]
+        item_dicts = []
+
+        for case_item in case_items:
+            for image_path_item in image_path_items:
+                if case_item.patient_user_id == image_path_item.user_id:
+                    item_dict = {
+                        "case_id": case_item.case_id,
+                        "doctor_user_id": case_item.doctor_user_id,
+                        "patient_user_id": case_item.patient_user_id,
+                        "status": case_item.status,
+                        "insights": case_item.insights,
+                        "created_at": case_item.created_at,
+                        "image_path": image_path_item.image_path
+                    }
+                    item_dicts.append(item_dict)
+                    break
+        print("item_dicts: ", item_dicts)
 
         return item_dicts
 
 
-case = CRUDCase(Doctor)
+casez = CRUDCase(Doctor)
