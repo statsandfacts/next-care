@@ -24,7 +24,7 @@ def update_case(
         """
         try:
             logger.info("patient user id ------> %s", case_update_details.patient_user_id)
-            case = crud.case.get_by_patient_user_id(db, user_id = case_update_details.patient_user_id)
+            case = crud.casez.get_by_patient_user_id(db, user_id = case_update_details.patient_user_id)
             if not case:
                 raise HTTPException(
                     status_code=404,
@@ -41,12 +41,30 @@ def update_case(
 def create_case(case_details: CaseCreate, db: Session = Depends(get_db)
                 ) -> Any:
     try:
-        if (crud.case.get_by_patient_user_id(db, user_id = case_details.patient_id)) is not None:
+        if (crud.casez.get_by_patient_user_id(db, user_id = case_details.patient_id)) is not None:
             raise HTTPException(
                 status_code=409,
                 detail="The user already has a case created",
             )
-        crud.case.create(db, obj_in=case_details)
+        crud.casez.create(db, obj_in=case_details)
         return JSONResponse(content={"message": "Case created successfully", "status": 200}, status_code=200)
+    except HTTPException as e:
+        return JSONResponse(content={"detail": str(e.detail), "status": e.status_code}, status_code=e.status_code)
+
+
+@router.get("/case-details", response_model=CaseUpdate)
+def read_by_case_id(
+    case_id: str,
+    db: Session = Depends(get_db),
+) -> Any:
+    try:
+        case = crud.casez.get_by_case_id(db, case_id=case_id)
+        if not case:
+            raise HTTPException(
+                status_code=404,
+                detail="The case does not exist in the system",
+            )
+        return case
+        #return JSONResponse(content={"user": case, "status": 200}, status_code=200)
     except HTTPException as e:
         return JSONResponse(content={"detail": str(e.detail), "status": e.status_code}, status_code=e.status_code)

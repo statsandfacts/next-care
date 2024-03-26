@@ -19,6 +19,9 @@ class CRUDCase(CRUDBase[Doctor, CaseCreate, CaseUpdate]):
     def get_by_patient_user_id(self, db: Session, *, user_id: str) -> Optional[Doctor]:
         return db.query(self.model).filter(Doctor.patient_user_id == user_id).first()
 
+    def get_by_case_id(self, db: Session, *, case_id: str) -> Optional[Doctor]:
+        return db.query(self.model).filter(Doctor.case_id == case_id).first()
+
     def create(self, db: Session, *, obj_in: CaseCreate) -> Doctor:
 
         try:
