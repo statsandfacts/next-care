@@ -4,7 +4,7 @@ from app.db.base import Base
 from fastapi.encoders import jsonable_encoder
 from pydantic import UUID4, BaseModel
 from sqlalchemy.orm import Session, aliased, joinedload
-from sqlalchemy import or_, literal, not_, select, Column, String
+from sqlalchemy import or_, literal, not_, select, Column, String, and_
 from app.models import User, Doctor
 
 # Define custom types for SQLAlchemy models, and Pydantic schemas
@@ -81,6 +81,19 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     #     """
     #     print("fdsf: ", type(db.query(self.model).offset(skip).limit(limit).all()))
     #     return db.query(self.model).offset(skip).limit(limit).all()
+
+    def get_doctors(self, db: Session, status: bool, search_name: str, skip: int = 0, limit: int = 10):
+        if not search_name:
+            #items = db.query(User).filter(User.user_type == "doctor").offset(skip).limit(limit).all()
+            items = db.query(self.model).filter(self.model.user_type == "doctor").offset(skip).limit(limit).all()
+            print("if items:", items)
+        else:
+            items = db.query(self.model).filter(and_(User.user_type == "doctor", User.is_active == status,
+                                                     User.first_name.like(f'%{search_name}%'))).offset(skip).limit(
+                limit).all()
+            print("else items:", items)
+        item_dicts = [item.__dict__ for item in items]
+        return item_dicts
 
     def get_items(self, db: Session, status: int, skip: int = 0, limit: int = 10) -> List[Dict]:
         """

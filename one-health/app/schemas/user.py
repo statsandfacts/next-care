@@ -88,7 +88,8 @@ class PaginatedItemList(BaseModel):
 
 
 class CaseCreate(BaseModel):
-    pass
+    patient_user_id: str
+    image_path: str
 
 
 class CaseUpdate(BaseModel):

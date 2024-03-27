@@ -1,5 +1,5 @@
 import logging, json
-from typing import Any, List
+from typing import Any, List, Optional
 
 from app import crud, models, schemas
 from app.api import deps
@@ -229,7 +229,7 @@ def update_user(
     except HTTPException as e:
         return JSONResponse(content={"detail": str(e.detail), "status": e.status_code}, status_code=e.status_code)
 
-@router.get("/items/", response_model=PaginatedItemList)
+@router.get("/patient-list/", response_model=PaginatedItemList)
 def get_items(
         status: int,
         db: Session = Depends(get_db),
@@ -250,7 +250,30 @@ def get_items(
         limit=limit,
     )
 
-@router.get("/doctor-list", response_model=PaginatedItemDoctorList)
+@router.get("/doctor-list/", response_model=PaginatedItemList)
+def get_items(
+        status: bool,
+        search_name: Optional[str] = None,
+        db: Session = Depends(get_db),
+        page: int = Query(default=1, ge=1),
+        limit: int = Query(default=10, ge=1),
+):
+    # Calculate skip value based on page number and page size
+    skip = (page - 1) * limit
+
+    # Retrieve paginated items from the database
+    items = crud.user.get_doctors(db, status=status, search_name=search_name, skip=skip, limit=limit)
+
+    # Return paginated items along with metadata
+    return PaginatedItemList(
+        total=len(items),
+        items=items,
+        skip=skip,
+        limit=limit,
+    )
+
+
+@router.get("/doctor-case-list", response_model=PaginatedItemDoctorList)
 def get_doctor_list(doctor_user_id: str,
         status: int,
         db: Session = Depends(get_db),
