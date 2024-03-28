@@ -43,11 +43,13 @@ def view_key_criteria():
         else:
             grouped_data[key] = item[2]  # Store third index value
 
+    print("key value", key[0])
     # Convert dictionary items to list of tuples
     grouped_list = [(key[0], key[1], value) for key, value in grouped_data.items()]
+    sorted_grouped_list = sorted(grouped_list, key=lambda x: x[0])
 
     #return {"key_criteria": result}
-    return JSONResponse(content={"key_criteria": grouped_list, "status": 200}, status_code=200)
+    return JSONResponse(content={"key_criteria": sorted_grouped_list, "status": 200}, status_code=200)
 
 @router.put("/update_key_criteria/{level_id}")
 def update_key_criteria(level_id: str, mapping: LevelValueMapping):
