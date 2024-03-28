@@ -147,9 +147,9 @@ def create_question_abbreviation(question: QuestionAbbreviationMap):
         values = (question.question_id, question.question, question.answer, question.abbreviation)
         mycursor.execute(query, values)
         mydb.commit()
-        return JSONResponse(content={"question": question, "status": 200}, status_code=200)
-    except HTTPException as e:
-        return JSONResponse(content={"detail": str(e.detail), "status": e.status_code}, status_code=e.status_code)
+        return JSONResponse(content={"question": dict(question), "status": 200}, status_code=200)
+    except Exception as e:
+        return JSONResponse(content={"detail": "Error occured while inserting data", "status": "500"}, status_code=500)
     #return question
 
 
