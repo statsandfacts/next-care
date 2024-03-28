@@ -1,9 +1,10 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Query, Path
 from app.models.master_questionnaire import MasterQuestionnaireCreate, MasterQuestionnaireModel, MasterQuestionnareDetail
+from app.models.QuestionAbbreviationMap import QuestionAbbreviationMap
 from app.models.question_value import QuestionValueModel,QuestionValue
 from app.database.engine import mycursor, mydb
 from fastapi import HTTPException
-from typing import List
+from typing import List, Optional
 
 from starlette.responses import JSONResponse
 
@@ -138,3 +139,87 @@ def show_question_details(master_questionnaire: MasterQuestionnareDetail):
 
     #return question_details
     return JSONResponse(content={"question_details": question_details, "status": 200}, status_code=200)
+
+@router.post("/add-abbreviation/", response_model=QuestionAbbreviationMap)
+def create_question_abbreviation(question: QuestionAbbreviationMap):
+    try:
+        query = "INSERT INTO Question_Abbreviation_Map (question_id, question, answer, abbreviation) VALUES (%s, %s, %s, %s)"
+        values = (question.question_id, question.question, question.answer, question.abbreviation)
+        mycursor.execute(query, values)
+        mydb.commit()
+        return JSONResponse(content={"question": question, "status": 200}, status_code=200)
+    except HTTPException as e:
+        return JSONResponse(content={"detail": str(e.detail), "status": e.status_code}, status_code=e.status_code)
+    #return question
+
+
+# Read operation
+@router.get("/get-abbreviation/")
+def read_question(question_id: int = Query(..., description="Question ID"),
+                  question: str = Query(..., description="Question"),
+                  answer: str = Query(..., description="Answer")):
+    try:
+        query = "SELECT question_id, question, answer, abbreviation FROM Question_Abbreviation_Map WHERE"
+        params = []
+
+        query += " question_id = %s AND question = %s AND answer = %s"
+        params.extend([question_id, question, answer])
+
+        mycursor.execute(query, tuple(params))
+        result = mycursor.fetchone()
+
+        if not result:
+            raise HTTPException(status_code=404, detail="Question not found")
+
+        return JSONResponse(
+            content={"question_id": result[0], "question": result[1], "answer": result[2], "abbreviation": result[3],
+                     "status": 200}, status_code=200)
+    except HTTPException as e:
+        return JSONResponse(content={"detail": str(e.detail), "status": e.status_code}, status_code=e.status_code)
+
+
+
+
+# Update operation
+@router.put("/update-abbreviation/")
+def update_question(question_id: int,
+                    question: str,
+                    answer: str,
+                    abbreviation: Optional[str]):
+    try:
+        query = "UPDATE Question_Abbreviation_Map SET question = %s, answer = %s, abbreviation = %s WHERE question_id = %s"
+        params = [question, answer, abbreviation, question_id]
+
+        mycursor.execute(query, params)
+        mydb.commit()
+
+        if mycursor.rowcount == 0:
+            raise HTTPException(status_code=404, detail="Question not found")
+
+        return JSONResponse(content={"message": "Question updated successfully", "status": 200}, status_code=200)
+    except HTTPException as e:
+        return JSONResponse(content={"detail": str(e.detail), "status": e.status_code}, status_code=e.status_code)
+
+
+# Delete operation
+@router.delete("/delete-abbreviation/")
+def delete_question(question_id: int = Query(..., description="Question ID"),
+                    question: str = Query(..., description="Question"),
+                    answer: str = Query(..., description="Answer")):
+    try:
+        query = "DELETE FROM Question_Abbreviation_Map WHERE"
+        params = []
+
+        query += " question_id = %s AND question = %s AND answer = %s"
+        params.extend([question_id, question, answer])
+
+        mycursor.execute(query, tuple(params))
+        mydb.commit()
+
+        if mycursor.rowcount == 0:
+            raise HTTPException(status_code=404, detail="Question not found")
+
+        return JSONResponse(content={"message": "Question deleted successfully", "status": 200}, status_code=200)
+    except HTTPException as e:
+        return JSONResponse(content={"detail": str(e.detail), "status": e.status_code}, status_code=e.status_code)
+
