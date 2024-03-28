@@ -73,7 +73,12 @@ def delete_key_criteria(level_id: str):
     val = (level_id,)
     mycursor.execute(sql, val)
     mydb.commit()
-    if mycursor.rowcount == 0:
-        raise HTTPException(status_code=404, detail="Key criteria not found")
-    #return {"message": f"Key criteria with ID {level_id} deleted successfully"}
-    return JSONResponse(content={"message": f"Key criteria with ID {level_id} deleted successfully", "status": 200}, status_code=200)
+    try:
+        if mycursor.rowcount == 0:
+            raise HTTPException(status_code=404, detail="Key criteria not found")
+        # return {"message": f"Key criteria with ID {level_id} deleted successfully"}
+        return JSONResponse(content={"message": f"Key criteria with ID {level_id} deleted successfully", "status": 200},
+                            status_code=200)
+    except HTTPException as e:
+        return JSONResponse(content={"detail": str(e.detail), "status": e.status_code}, status_code=e.status_code)
+

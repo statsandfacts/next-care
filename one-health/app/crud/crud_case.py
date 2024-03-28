@@ -26,11 +26,18 @@ class CRUDCase(CRUDBase[Doctor, CaseCreate, CaseUpdate]):
 
         try:
             db_obj = Doctor()
-            db_obj.doctor_user_id = obj_in.doctor_user_id
-            db_obj.patient_user_id = obj_in.patient_user_id
+            #db_obj.doctor_user_id = obj_in.doctor_user_id
+            db_obj.patient_user_id = obj_in.patient_id
             db_obj.status = 'In Progress'
 
+            #model call
+            upload_obj = UserUpload()
+            upload_obj.user_id = obj_in.patient_id
+            upload_obj.image_path = obj_in.image_path
+            upload_obj.image_output_label = "Acne grade 1" #model_output
+
             db.add(db_obj)
+            db.add(upload_obj)
             db.commit()
             db.refresh(db_obj)
         except IntegrityError as ie:
@@ -95,8 +102,7 @@ class CRUDCase(CRUDBase[Doctor, CaseCreate, CaseUpdate]):
                 filter(UserUpload.user_id.in_(user_ids)). \
                 filter(func.DATE(UserUpload.created_at) == func.DATE(case_items[0].created_at)). \
                 all()
-            print("image_path_items: ", image_path_items[0].user_id)
-            print("case_item.patient_user_id: ", case_items[0].patient_user_id)
+            print("image_path_items: ", len(image_path_items))
 
         item_dicts = []
 
