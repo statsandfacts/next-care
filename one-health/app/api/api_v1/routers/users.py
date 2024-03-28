@@ -275,7 +275,7 @@ def get_items(
 
 @router.get("/doctor-case-list", response_model=PaginatedItemDoctorList)
 def get_doctor_list(doctor_user_id: str,
-        status: int,
+        status: str,
         db: Session = Depends(get_db),
         page: int = Query(default=1, ge=1),
         limit: int = Query(default=10, ge=1)
