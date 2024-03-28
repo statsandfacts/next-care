@@ -30,7 +30,7 @@ def update_case(
                     status_code=404,
                     detail="The case does not exist in the system",
                 )
-            crud.case.update_case(db, db_obj=case, obj_in=case_update_details)
+            crud.casez.update_case(db, db_obj=case, obj_in=case_update_details)
             return JSONResponse(content={"message": "Updated user details successfully", "status": 200},
                                 status_code=200)
         except HTTPException as e:

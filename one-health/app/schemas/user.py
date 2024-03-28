@@ -96,7 +96,7 @@ class CaseUpdate(BaseModel):
     doctor_user_id: str
     patient_user_id: str
     insights: str
-    status: bool
+    status: str
     case_id: str
 
 
