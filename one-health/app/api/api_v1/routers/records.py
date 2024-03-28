@@ -73,10 +73,14 @@ async def update_records(key_combination: str, QuestionSequenceLayout: QuestionS
     return JSONResponse(content={"message": f"Records with key_combination '{key_combination}' updated successfully", "status": 200}, status_code=200)
 
 # Delete records endpoint
-@router.delete("/delete_records/{key_combination}")
-async def delete_records(key_combination: str):
-    sql = "DELETE FROM Question_sequence_layout WHERE KEY_COMBINATION = %s"
-    val = (key_combination,)
+@router.delete("/delete_records/{key_combination}/{question_id}")
+async def delete_records(key_combination: str, question_id: str):
+    if question_id:
+        sql = "DELETE FROM Question_sequence_layout WHERE KEY_COMBINATION = %s AND question_id = %s"
+        val = (key_combination, question_id)
+    else:
+        sql = "DELETE FROM Question_sequence_layout WHERE KEY_COMBINATION = %s"
+        val = (key_combination,)
     
     mycursor.execute(sql, val)
     mydb.commit()
