@@ -109,12 +109,15 @@ class CRUDCase(CRUDBase[Doctor, CaseCreate, CaseUpdate]):
         for case_item in case_items:
             for image_path_item in image_path_items:
                 if case_item.patient_user_id == image_path_item.user_id:
+                    insights_value = case_item.insights if case_item.insights is not None else ""
+                    doctor_user_id_val = case_item.doctor_user_id if case_item.doctor_user_id is not None else ""
+
                     item_dict = {
                         "case_id": case_item.case_id,
-                        "doctor_user_id": case_item.doctor_user_id,
+                        "doctor_user_id": doctor_user_id_val,
                         "patient_user_id": case_item.patient_user_id,
                         "status": case_item.status,
-                        "insights": case_item.insights,
+                        "insights": insights_value,
                         "created_at": case_item.created_at,
                         "image_path": image_path_item.image_path
                     }
