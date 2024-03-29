@@ -15,7 +15,7 @@ from sqlalchemy.orm import Session
 from app.models.doctor import Doctor
 
 from app.schemas import UserCreate
-from app.schemas.user import UserLogin, UserLogOut, PaginatedItemList, PaginatedItemDoctorList, SaveUserResponse, GetUserResponse
+from app.schemas.user import UserLogin, UserLogOut, PaginatedItemList, PaginatedItemDoctorList, SaveUserResponse, GetUserResponse, PatientDashboardResponseList
 from fastapi.responses import JSONResponse
 
 router = APIRouter(prefix="/users", tags=["users"])
@@ -185,6 +185,26 @@ def create_user_open(
     )
     user = crud.user.create(db, obj_in=user_in)
     return user
+
+@router.get("/patient_dashboard", response_model=PatientDashboardResponseList)
+def get_dashboard(user_id: str,
+    db: Session = Depends(deps.get_db),
+) -> Any:
+    try:
+        user = crud.user.get(db, id=user_id)
+        if not user:
+            raise HTTPException(
+                status_code=404,
+                detail="The user does not exist in the system",
+            )
+        casess = crud.casez.get_patient_dashboard(db, db_obj=user)
+        return PatientDashboardResponseList(
+            cases=casess,
+            status = 200
+        )
+    except HTTPException as e:
+        return JSONResponse(content={"detail": str(e.detail), "status": e.status_code}, status_code=e.status_code)
+
 
 
 @router.get("/get-user", response_model=schemas.User)

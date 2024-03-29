@@ -1,7 +1,7 @@
 import logging
 
 from sqlalchemy.orm import Session
-from app.schemas.user import CaseCreate, CaseUpdate
+from app.schemas.user import CaseCreate, CaseUpdate, PatientDashboardResponse, PatientDashboardResponseList
 from app.models.doctor import Doctor
 from app.models.user_upload import UserUpload
 from sqlalchemy.exc import IntegrityError
@@ -9,6 +9,7 @@ from app.crud.base import CRUDBase
 from fastapi import HTTPException
 from typing import Any, Dict, List, Optional, Union
 from sqlalchemy import or_, func, and_
+from app.models.user import User
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -26,15 +27,15 @@ class CRUDCase(CRUDBase[Doctor, CaseCreate, CaseUpdate]):
 
         try:
             db_obj = Doctor()
-            #db_obj.doctor_user_id = obj_in.doctor_user_id
+            # db_obj.doctor_user_id = obj_in.doctor_user_id
             db_obj.patient_user_id = obj_in.patient_id
             db_obj.status = 'In Progress'
 
-            #model call
+            # model call
             upload_obj = UserUpload()
             upload_obj.user_id = obj_in.patient_id
             upload_obj.image_path = obj_in.image_path
-            upload_obj.image_output_label = "Acne grade 1" #model_output
+            upload_obj.image_output_label = "Acne grade 1"  # model_output
 
             db.add(db_obj)
             db.add(upload_obj)
@@ -112,9 +113,8 @@ class CRUDCase(CRUDBase[Doctor, CaseCreate, CaseUpdate]):
                 print("jfewhbf: ", items)
                 if len(items) > 0:
                     image_path_items.append(items[0])
-                index = index +1
+                index = index + 1
                 print("image_path_items: ", len(image_path_items))
-
 
         item_dicts = []
 
@@ -141,6 +141,28 @@ class CRUDCase(CRUDBase[Doctor, CaseCreate, CaseUpdate]):
         print("item_dicts: ", item_dicts)
 
         return item_dicts
+
+    def get_patient_dashboard(self, db: Session, db_obj: User):
+        case_pages = []
+        cases = db.query(self.model).filter(Doctor.patient_user_id == db_obj.user_id).all()
+        if len(cases) > 0:
+            for case in cases:
+                upload_db = db.query(UserUpload).filter(
+                    UserUpload.user_id == case.patient_user_id).first()
+                diseases = upload_db.image_output_label
+                doctor_obj = db.query(User).filter(User.user_id == case.doctor_user_id).first()
+                doctor_name = doctor_obj.first_name + " " + doctor_obj.last_name
+                case_page = PatientDashboardResponse(
+                    case_id=case.case_id,
+                    diseases=diseases,
+                    doctor_name=doctor_name,
+                    created_date=case.created_at.strftime("%B %d, %Y")
+                )
+                case_pages.append(case_page)
+        return case_pages
+
+
+
 
 
 casez = CRUDCase(Doctor)

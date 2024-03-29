@@ -123,3 +123,16 @@ class SaveUserResponse(BaseModel):
 
 class GetUserResponse(BaseModel):
     question_answers: List[Dict[str, Optional[str]]]
+
+
+class PatientDashboardResponse(BaseModel):
+    case_id: str
+    diseases: str
+    doctor_name: str
+    created_date: str
+
+class PatientDashboardResponseList(BaseModel):
+    cases: List[PatientDashboardResponse]
+    status: int
+
+
