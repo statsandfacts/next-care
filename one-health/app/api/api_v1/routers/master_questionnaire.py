@@ -213,6 +213,8 @@ def update_question(question_id: int,
         return JSONResponse(content={"message": "Question updated successfully", "status": 200}, status_code=200)
     except HTTPException as e:
         return JSONResponse(content={"detail": str(e.detail), "status": e.status_code}, status_code=e.status_code)
+    except Exception as ex:
+        return JSONResponse(content={"detail": ex.__cause__, "status": 500}, status_code=500)
 
 
 # Delete operation
