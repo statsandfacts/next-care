@@ -117,8 +117,6 @@ class CRUDCase(CRUDBase[Doctor, CaseCreate, CaseUpdate]):
 
 
         item_dicts = []
-        print("image_path_items 0: ", image_path_items[0].user_id)
-        print("image_path_items 1: ", image_path_items[1].user_id)
 
         for case_item in case_items:
             print("case_item.patient_user_id: ", case_item.patient_user_id)
