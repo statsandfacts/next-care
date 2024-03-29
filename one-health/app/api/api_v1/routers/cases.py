@@ -2,7 +2,7 @@ import logging
 from fastapi import APIRouter, Body, Depends, HTTPException
 from typing import Any, List
 from app.api.deps import get_db
-from app.schemas.user import CaseCreate, CaseUpdate
+from app.schemas.user import CaseCreate, CaseUpdate, CasePage
 from app import crud, models, schemas
 from fastapi.responses import JSONResponse
 from app.models.doctor import Doctor
@@ -52,19 +52,32 @@ def create_case(case_details: CaseCreate, db: Session = Depends(get_db)
         return JSONResponse(content={"detail": str(e.detail), "status": e.status_code}, status_code=e.status_code)
 
 
-@router.get("/case-details", response_model=CaseUpdate)
+@router.get("/case-details", response_model=CasePage)
 def read_by_case_id(
     case_id: str,
     db: Session = Depends(get_db),
 ) -> Any:
     try:
         case = crud.casez.get_by_case_id(db, case_id=case_id)
+        print("dwqfwq: ",case.patient_user_id)
+        user_session = crud.user_session.get_by_user_id(db, user_id=case.patient_user_id)
         if not case:
             raise HTTPException(
                 status_code=404,
                 detail="The case does not exist in the system",
             )
-        return case
+        session_id = user_session.session_id if user_session else None
+
+        # Create a CasePage object including session_id
+        case_page = CasePage(
+            doctor_user_id = case.doctor_user_id,
+            patient_user_id = case.patient_user_id,
+            insights = case.insights,
+            status= case.status,
+            session_id=session_id
+        )
+
+        return case_page
         #return JSONResponse(content={"user": case, "status": 200}, status_code=200)
     except HTTPException as e:
         return JSONResponse(content={"detail": str(e.detail), "status": e.status_code}, status_code=e.status_code)

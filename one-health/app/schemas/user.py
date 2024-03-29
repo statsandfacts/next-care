@@ -99,10 +99,18 @@ class CaseUpdate(BaseModel):
     status: str
     case_id: str
 
+class CasePage(BaseModel):
+    doctor_user_id: str  | None = None
+    patient_user_id: str | None = None
+    insights: str | None = None
+    status: str | None = None
+    case_id: str | None = None
+    session_id: str | None = None
+
 
 class PaginatedItemDoctorList(BaseModel):
     total: int
-    items: List[CaseUpdate]
+    items: List[CasePage]
     skip: int
     limit: int
 
