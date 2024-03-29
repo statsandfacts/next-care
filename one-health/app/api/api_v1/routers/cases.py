@@ -59,8 +59,8 @@ def read_by_case_id(
 ) -> Any:
     try:
         case = crud.casez.get_by_case_id(db, case_id=case_id)
-        print("dwqfwq: ",case.patient_user_id)
-        user_session = crud.user_session.get_by_user_id(db, user_id=case.patient_user_id)
+        patient_user_id = case.patient_user_id if case else None
+        user_session = crud.user_session.get_by_user_id(db, user_id=patient_user_id)
         if not case:
             raise HTTPException(
                 status_code=404,
