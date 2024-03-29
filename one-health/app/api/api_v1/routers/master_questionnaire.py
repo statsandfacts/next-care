@@ -199,10 +199,18 @@ def read_all_questions():
 def update_question(question_id: int,
                     question: str,
                     answer: str,
-                    abbreviation: Optional[str]):
+                    updated_question: Optional[str],
+                    updated_answer: Optional[str],
+                    abbreviation: Optional[str]
+                    ):
     try:
-        query = "UPDATE Question_Abbreviation_Map SET question = %s, answer = %s, abbreviation = %s WHERE question_id = %s"
-        params = [question, answer, abbreviation, question_id]
+        if not updated_question:
+            updated_question = question
+        if not updated_answer:
+            updated_answer = answer
+        query = ("UPDATE Question_Abbreviation_Map SET question = %s, answer = %s, abbreviation = %s WHERE question_id = %s"
+                 "AND question = %s AND answer = %s")
+        params = [updated_question, updated_answer, abbreviation, question_id, question, answer]
 
         mycursor.execute(query, params)
         mydb.commit()
