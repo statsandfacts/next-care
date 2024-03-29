@@ -177,6 +177,20 @@ def read_question(question_id: int = Query(..., description="Question ID"),
     except HTTPException as e:
         return JSONResponse(content={"detail": str(e.detail), "status": e.status_code}, status_code=e.status_code)
 
+@router.get("/abbreviation/all", response_model=List[QuestionAbbreviationMap])
+def read_all_questions():
+    try:
+        query = "SELECT question_id, question, answer, abbreviation FROM Question_Abbreviation_Map"
+        mycursor.execute(query)
+        results = mycursor.fetchall()
+
+        if not results:
+            raise HTTPException(status_code=404, detail="No questions found")
+
+        return JSONResponse(content={"abbreviations": [{"question_id": row[0], "question": row[1], "answer": row[2], "abbreviation": row[3]} for row in
+                results], "status": 200}, status_code=200)
+    except HTTPException as e:
+        return JSONResponse(content={"detail": str(e.detail), "status": e.status_code}, status_code=e.status_code)
 
 
 
