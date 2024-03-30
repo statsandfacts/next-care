@@ -6,6 +6,7 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from app.schemas.user import CreateDiagnosis
+from app.models.diagnose_code_table import DiagnoseCodeTable
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -47,6 +48,10 @@ class CRUDDiagnosisMedicine(CRUDBase[DiagnosisMedicineMapping, CreateDiagnosis, 
             raise HTTPException(status_code=404, detail="Mapping not found")
         db.delete(mapping)
         db.commit()
+
+
+    def get_all_diagnosis(self, db:Session) -> List[DiagnoseCodeTable]:
+        return db.query(DiagnoseCodeTable).all()
 
 
 diagnosis = CRUDDiagnosisMedicine(DiagnosisMedicineMapping)

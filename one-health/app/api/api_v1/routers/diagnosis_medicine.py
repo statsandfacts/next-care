@@ -93,3 +93,16 @@ def delete_mapping(mapping_id: str, db: Session = Depends(get_db)):
         return JSONResponse(content={"message": "mapping deleted successfully", "status": 200}, status_code=200)
     except HTTPException as ex:
         return JSONResponse(content={"detail": "mapping not found", "status": 500}, status_code=500)
+
+
+@router.get("/get-diagnosis")
+def get_all_diagnosis(db: Session = Depends(get_db)):
+    items = crud.diagnosis.get_all_diagnosis(db)
+    mapped_dicts = []
+    for mapping in items:
+        mapped_dict = {
+            "diagnosis": mapping.diagnosis,
+            "code_id": mapping.code_id
+        }
+        mapped_dicts.append(mapped_dict)
+    return JSONResponse(content={"mappings": mapped_dicts, "status": 200}, status_code=200)

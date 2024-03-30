@@ -11,7 +11,7 @@ class DiagnosisMedicineMapping(Base):
        """
     __tablename__ = 'diagnosis_medicine_mapping'
     mapping_id =  Column(CHAR(36), primary_key=True, index=True, default=uuid4)
-    visit = Column(String, primary_key=True)
+    visit = Column(String)
     diagnosis = Column(String)
     medicine = Column(String)
     company = Column(String)
