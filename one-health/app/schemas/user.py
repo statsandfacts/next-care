@@ -135,4 +135,11 @@ class PatientDashboardResponseList(BaseModel):
     cases: List[PatientDashboardResponse]
     status: int
 
+class CreateDiagnosis(BaseModel):
+    visit: str
+    diagnosis: str
+    medicine: str
+    company: str
+    dosage: str
+
 
