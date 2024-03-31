@@ -199,6 +199,11 @@ class CRUDCase(CRUDBase[Doctor, CaseCreate, CaseUpdate]):
                 status_code=404,
                 detail="case doesn't exist in the system."
             )
+        if not case.doctor_user_id:
+            raise HTTPException(
+                status_code=400,
+                detail="Please assign the case to a doctor first"
+            )
         visit = "First"
         if case.sec_case_id:
             visit = "Second"
