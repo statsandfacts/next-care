@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Optional, List, Dict, Any
 
 from app.schemas.user_role import UserRole
-from pydantic import UUID4, BaseModel, EmailStr
+from pydantic import UUID4, BaseModel, EmailStr, Field
 from sqlalchemy import JSON
 
 
@@ -96,6 +96,7 @@ class CaseUpdate(BaseModel):
     doctor_user_id: str
     patient_user_id: str
     insights: str
+    remarks: str
     status: str
     case_id: str
 
@@ -141,5 +142,18 @@ class CreateDiagnosis(BaseModel):
     medicine: str
     company: str
     dosage: str
+
+class ImagePath(BaseModel):
+    name: str
+    value: Optional[str]
+
+
+class CaseReport(BaseModel):
+    image_path: List[ImagePath] = Field(..., alias="image_path")
+    question_answers: List[Dict[str, Optional[str]]]
+
+
+class CaseReportResponse(BaseModel):
+    case_report: CaseReport = Field(..., alias="case-report")
 
 

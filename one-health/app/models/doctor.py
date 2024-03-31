@@ -17,6 +17,7 @@ class Doctor(Base):
     doctor_user_id = Column(String(255), index=True)
     patient_user_id = Column(String(255), index=True)
     insights = Column(String(255), index=True)
+    remarks = Column(String(255), index=True)
     status = Column(String(50), index=True)
     created_at = Column(
         TIMESTAMP(timezone=True),
@@ -26,5 +27,12 @@ class Doctor(Base):
         TIMESTAMP(timezone=True),
         server_default=func.now(),
         onupdate=func.now()
+    )
+
+    user_uploads = relationship(
+        "UserUpload",
+        back_populates="doctor",
+        primaryjoin="Doctor.case_id == UserUpload.case_id",
+        uselist=False
     )
 

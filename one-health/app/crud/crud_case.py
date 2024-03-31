@@ -1,9 +1,10 @@
 import logging
 
 from sqlalchemy.orm import Session
-from app.schemas.user import CaseCreate, CaseUpdate, PatientDashboardResponse, PatientDashboardResponseList
+from app.schemas.user import CaseCreate, CaseUpdate, PatientDashboardResponse, PatientDashboardResponseList, ImagePath, CaseReport, CaseReportResponse
 from app.models.doctor import Doctor
 from app.models.user_upload import UserUpload
+from app.models.user_session import UserSession
 from sqlalchemy.exc import IntegrityError
 from app.crud.base import CRUDBase
 from fastapi import HTTPException
@@ -36,9 +37,10 @@ class CRUDCase(CRUDBase[Doctor, CaseCreate, CaseUpdate]):
             upload_obj.user_id = obj_in.patient_id
             upload_obj.image_path = obj_in.image_path
             upload_obj.image_output_label = "Acne grade 1"  # model_output
+            db_obj.user_uploads = upload_obj
 
             db.add(db_obj)
-            db.add(upload_obj)
+            #db.add(upload_obj)
             db.commit()
             db.refresh(db_obj)
         except IntegrityError as ie:
@@ -134,7 +136,8 @@ class CRUDCase(CRUDBase[Doctor, CaseCreate, CaseUpdate]):
                         "status": case_item.status,
                         "insights": insights_value,
                         "created_at": case_item.created_at,
-                        "image_path": image_path_item.image_path
+                        "image_path": image_path_item.image_path,
+                        "remarks": case_item.remarks
                     }
                     item_dicts.append(item_dict)
                     break
@@ -161,7 +164,31 @@ class CRUDCase(CRUDBase[Doctor, CaseCreate, CaseUpdate]):
                 case_pages.append(case_page)
         return case_pages
 
+    def get_case_report(self, db:Session, case_id:str):
+        case = db.query(self.model).filter(self.model.case_id == case_id).first()
+        if not case:
+            raise HTTPException(
+                status_code=404,
+                detail="case doesn't exist in the system."
+            )
+        user_upload = db.query(UserUpload).filter(
+                    UserUpload.case_id == case.case_id).first()
 
+        image_path_list = user_upload.image_path.split(',')
+        image_output_label_list = user_upload.image_output_label.split(',')
+        mapped_values = [ImagePath(name=path, value=label) for path, label in zip(image_path_list, image_output_label_list)]
+
+
+        user_session = db.query(UserSession).filter(UserSession.user_id == case.patient_user_id).first()
+        question_ans= [{}]
+        if user_session:
+            question_ans = user_session.question_answers
+
+        case_report = CaseReport(
+            image_path=mapped_values,
+            question_answers= question_ans
+        )
+        return case_report
 
 
 
