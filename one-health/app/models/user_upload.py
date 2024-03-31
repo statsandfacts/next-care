@@ -17,6 +17,11 @@ class UserUpload(Base):
         ForeignKey("user.user_id"),
         nullable=False,
     )
+    case_id = Column(
+        CHAR(36),
+        ForeignKey("Doctor.case_id"),
+        nullable=False,
+    )
     image_path = Column(String(255), index=True)
     image_output_label = Column(String(500), index=True)
     created_at = Column(
@@ -30,3 +35,4 @@ class UserUpload(Base):
     )
 
     user = relationship("User", back_populates="user_upload", uselist=False)
+    doctor = relationship("Doctor", back_populates="user_uploads", uselist=False)
