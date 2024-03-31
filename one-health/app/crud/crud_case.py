@@ -194,14 +194,14 @@ class CRUDCase(CRUDBase[Doctor, CaseCreate, CaseUpdate]):
 
     def get_prescription(self, db: Session, case_id):
         case = db.query(self.model).filter(self.model.case_id == case_id).first()
-        visit = "First"
-        if case.sec_case_id:
-            visit = "Second"
         if not case:
             raise HTTPException(
                 status_code=404,
                 detail="case doesn't exist in the system."
             )
+        visit = "First"
+        if case.sec_case_id:
+            visit = "Second"
         user_doc = db.query(User).filter(User.user_id == case.doctor_user_id).first()
         doctor_name = user_doc.first_name + " " + user_doc.last_name
         user_upload = db.query(UserUpload).filter(
