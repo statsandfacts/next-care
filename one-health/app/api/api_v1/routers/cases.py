@@ -2,7 +2,7 @@ import logging
 from fastapi import APIRouter, Body, Depends, HTTPException
 from typing import Any, List
 from app.api.deps import get_db
-from app.schemas.user import CaseCreate, CaseUpdate, CasePage, CaseReport
+from app.schemas.user import CaseCreate, CaseUpdate, CasePage, CaseReport, DiagnosisMedicineReport
 from app import crud, models, schemas
 from fastapi.responses import JSONResponse
 from app.models.doctor import Doctor
@@ -51,6 +51,16 @@ def create_case(case_details: CaseCreate, db: Session = Depends(get_db)
     except HTTPException as e:
         return JSONResponse(content={"detail": str(e.detail), "status": e.status_code}, status_code=e.status_code)
 
+@router.get("/prescription", response_model=DiagnosisMedicineReport)
+def get_prescription(
+    case_id: str,
+    db: Session = Depends(get_db),
+) -> Any:
+    try:
+        case = crud.casez.get_prescription(db, case_id=case_id)
+        return case
+    except HTTPException as e:
+        return JSONResponse(content={"detail": str(e.detail), "status": e.status_code}, status_code=e.status_code)
 
 @router.get("/case-report", response_model=CaseReport)
 def case_report(

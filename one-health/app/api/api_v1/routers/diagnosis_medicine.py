@@ -5,7 +5,6 @@ from app.api.deps import get_db
 from app import crud, models, schemas
 from fastapi.responses import JSONResponse
 from app.models.doctor import Doctor
-from app.models.diagnosis_medicine_mapping import DiagnosisMedicineMapping
 from app.schemas.user import CreateDiagnosis
 
 

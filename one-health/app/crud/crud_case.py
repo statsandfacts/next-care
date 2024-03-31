@@ -1,7 +1,8 @@
 import logging
 
 from sqlalchemy.orm import Session
-from app.schemas.user import CaseCreate, CaseUpdate, PatientDashboardResponse, PatientDashboardResponseList, ImagePath, CaseReport, CaseReportResponse
+from app.schemas.user import CaseCreate, CaseUpdate, PatientDashboardResponse, PatientDashboardResponseList, ImagePath, \
+    CaseReport, CaseReportResponse, DiagnosisMedicine, DiagnosisMedicineReport
 from app.models.doctor import Doctor
 from app.models.user_upload import UserUpload
 from app.models.user_session import UserSession
@@ -11,6 +12,7 @@ from fastapi import HTTPException
 from typing import Any, Dict, List, Optional, Union
 from sqlalchemy import or_, func, and_
 from app.models.user import User
+from app.models.diagnosis_medicine_mapping import DiagnosisMedicineMapping
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -40,7 +42,7 @@ class CRUDCase(CRUDBase[Doctor, CaseCreate, CaseUpdate]):
             db_obj.user_uploads = upload_obj
 
             db.add(db_obj)
-            #db.add(upload_obj)
+            # db.add(upload_obj)
             db.commit()
             db.refresh(db_obj)
         except IntegrityError as ie:
@@ -164,7 +166,7 @@ class CRUDCase(CRUDBase[Doctor, CaseCreate, CaseUpdate]):
                 case_pages.append(case_page)
         return case_pages
 
-    def get_case_report(self, db:Session, case_id:str):
+    def get_case_report(self, db: Session, case_id: str):
         case = db.query(self.model).filter(self.model.case_id == case_id).first()
         if not case:
             raise HTTPException(
@@ -172,24 +174,53 @@ class CRUDCase(CRUDBase[Doctor, CaseCreate, CaseUpdate]):
                 detail="case doesn't exist in the system."
             )
         user_upload = db.query(UserUpload).filter(
-                    UserUpload.case_id == case.case_id).first()
+            UserUpload.case_id == case.case_id).first()
 
         image_path_list = user_upload.image_path.split(',')
         image_output_label_list = user_upload.image_output_label.split(',')
-        mapped_values = [ImagePath(name=path, value=label) for path, label in zip(image_path_list, image_output_label_list)]
-
+        mapped_values = [ImagePath(name=path, value=label) for path, label in
+                         zip(image_path_list, image_output_label_list)]
 
         user_session = db.query(UserSession).filter(UserSession.user_id == case.patient_user_id).first()
-        question_ans= [{}]
+        question_ans = [{}]
         if user_session:
             question_ans = user_session.question_answers
 
         case_report = CaseReport(
             image_path=mapped_values,
-            question_answers= question_ans
+            question_answers=question_ans
         )
         return case_report
 
+    def get_prescription(self, db: Session, case_id):
+        case = db.query(self.model).filter(self.model.case_id == case_id).first()
+        visit = "First"
+        if case.sec_case_id:
+            visit = "Second"
+        if not case:
+            raise HTTPException(
+                status_code=404,
+                detail="case doesn't exist in the system."
+            )
+        user_doc = db.query(User).filter(User.user_id == case.doctor_user_id).first()
+        doctor_name = user_doc.first_name + " " + user_doc.last_name
+        user_upload = db.query(UserUpload).filter(
+            UserUpload.case_id == case.case_id).first()
+        image_output_label_list = user_upload.image_output_label.split(',')
+        diagnosis_list = db.query(DiagnosisMedicineMapping).filter(
+            DiagnosisMedicineMapping.diagnosis.in_(image_output_label_list),
+            DiagnosisMedicineMapping.visit == visit
+        ).all()
+        diagnose_response_list = []
+        for item in diagnosis_list:
+            diagnose = DiagnosisMedicine(diagnosis=item.diagnosis,
+                                         medicine=item.medicine,
+                                         dosage=item.dosage
+                                         )
+            diagnose_response_list.append(diagnose)
+        return DiagnosisMedicineReport(patient_name= user_upload.user.first_name + " " + user_upload.user.last_name,
+                                       doctor_name= doctor_name, date= case.updated_at.strftime("%B %d, %Y"),
+                                       diagnosis_medicines=diagnose_response_list)
 
 
 casez = CRUDCase(Doctor)

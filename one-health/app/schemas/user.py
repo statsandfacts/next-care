@@ -157,3 +157,14 @@ class CaseReportResponse(BaseModel):
     case_report: CaseReport = Field(..., alias="case-report")
 
 
+class DiagnosisMedicine(BaseModel):
+    diagnosis: str
+    medicine: str
+    dosage: str
+
+class DiagnosisMedicineReport(BaseModel):
+    patient_name: str
+    doctor_name: str
+    date: str
+    diagnosis_medicines: List[DiagnosisMedicine]
+
