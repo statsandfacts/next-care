@@ -24,12 +24,13 @@ class CRUDSession(CRUDBase[UserSession, SaveUserResponse, SaveUserResponse]):
         print("sambeet: ", user_session)
         if user_session is None:
             self.create_session(db, user_id=user_id, session_id=session_id)
-        user_session_obj = SaveUserResponse(
-            session_id=session_id,
-            user_id=user_id,
-            question_answers=None
-        )
-        self.update_user_session(db, db_obj=user_session, obj_in=user_session_obj)
+        else:
+            user_session_obj = SaveUserResponse(
+                session_id=session_id,
+                user_id=user_id,
+                question_answers={[]}
+            )
+            self.update_user_session(db, db_obj=user_session, obj_in=user_session_obj)
 
     def update_user_session(self, db: Session,
                             *,
