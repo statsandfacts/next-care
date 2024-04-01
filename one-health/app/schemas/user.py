@@ -71,6 +71,8 @@ class UserInDBBase(UserBase):
 
 # Additional properties to return via API
 class User(UserInDBBase):
+    dob: str | None = None
+    gender: str | None = None
     pass
 
 

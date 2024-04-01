@@ -96,6 +96,9 @@ class CRUDCase(CRUDBase[Doctor, CaseCreate, CaseUpdate]):
         elif not doctor_user_id and status:
             case_items = db.query(self.model).filter(or_(self.model.status == status)).all()
             print("elif case items", case_items)
+        elif not status and doctor_user_id:
+            case_items = db.query(self.model).filter(self.model.doctor_user_id == doctor_user_id).all()
+            print("elif status null items", case_items)
         else:
             case_items = db.query(self.model). \
                 filter(and_(self.model.status == status, self.model.doctor_user_id == doctor_user_id)). \
