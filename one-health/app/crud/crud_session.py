@@ -27,8 +27,7 @@ class CRUDSession(CRUDBase[UserSession, SaveUserResponse, SaveUserResponse]):
         else:
             user_session_obj = SaveUserResponse(
                 session_id=session_id,
-                user_id=user_id,
-                question_answers=[{"": ""}]
+                user_id=user_id
             )
             self.update_user_session(db, db_obj=user_session, obj_in=user_session_obj)
 
