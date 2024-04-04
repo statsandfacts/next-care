@@ -97,10 +97,11 @@ class CaseCreate(BaseModel):
 class CaseUpdate(BaseModel):
     doctor_user_id: str
     patient_user_id: str
-    insights: str
-    remarks: str
+    insights: str | None = None
+    remarks: str | None = None
     status: str
     case_id: str
+    doctor_edit_image_insights: str | None = None
 
 class CasePage(BaseModel):
     doctor_user_id: str  | None = None
@@ -109,6 +110,7 @@ class CasePage(BaseModel):
     status: str | None = None
     case_id: str | None = None
     session_id: str | None = None
+    created_date: str | None = None
 
 
 class PaginatedItemDoctorList(BaseModel):

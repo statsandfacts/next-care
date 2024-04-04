@@ -19,6 +19,7 @@ class Doctor(Base):
     insights = Column(String(255), index=True)
     remarks = Column(String(255), index=True)
     status = Column(String(50), index=True)
+    doctor_edit_image_insights = Column(String(500))
     created_at = Column(
         TIMESTAMP(timezone=True),
         server_default=func.now()

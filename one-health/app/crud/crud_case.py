@@ -92,6 +92,8 @@ class CRUDCase(CRUDBase[Doctor, CaseCreate, CaseUpdate]):
             case_items = db.query(self.model).all()
             print("if case items", case_items)
             item_dicts = [item.__dict__ for item in case_items]
+            item_dicts = [{**item.__dict__, 'created_date': item.created_at.strftime("%B %d, %Y")} for item in case_items]
+
             return item_dicts
         elif not doctor_user_id and status:
             case_items = db.query(self.model).filter(or_(self.model.status == status)).all()
@@ -134,15 +136,17 @@ class CRUDCase(CRUDBase[Doctor, CaseCreate, CaseUpdate]):
                     insights_value = case_item.insights if case_item.insights is not None else ""
                     doctor_user_id_val = case_item.doctor_user_id if case_item.doctor_user_id is not None else ""
                     print("innnnnnnnnnnnnnnnn")
+                    print("created_at: ", case_item.created_at)
                     item_dict = {
                         "case_id": case_item.case_id,
                         "doctor_user_id": doctor_user_id_val,
                         "patient_user_id": case_item.patient_user_id,
                         "status": case_item.status,
                         "insights": insights_value,
-                        "created_at": case_item.created_at,
+                        "created_date": case_item.created_at.strftime("%B %d, %Y"),
                         "image_path": image_path_item.image_path,
-                        "remarks": case_item.remarks
+                        "remarks": case_item.remarks,
+                        "doctor_edit_image_insights": case_item.doctor_edit_image_insights
                     }
                     item_dicts.append(item_dict)
                     break
@@ -179,7 +183,7 @@ class CRUDCase(CRUDBase[Doctor, CaseCreate, CaseUpdate]):
         user_upload = db.query(UserUpload).filter(
             UserUpload.case_id == case.case_id).first()
 
-        image_path_list = user_upload.image_path.split(',')
+        image_path_list = user_upload.image_path.split(',') # change single list logic here
         image_output_label_list = user_upload.image_output_label.split(',')
         mapped_values = [ImagePath(name=path, value=label) for path, label in
                          zip(image_path_list, image_output_label_list)]

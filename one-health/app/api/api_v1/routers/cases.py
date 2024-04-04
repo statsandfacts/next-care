@@ -95,7 +95,8 @@ def read_by_case_id(
             patient_user_id = case.patient_user_id,
             insights = case.insights,
             status= case.status,
-            session_id=session_id
+            session_id=session_id,
+            created_at=case.created_at.strftime("%B %d, %Y")
         )
 
         return case_page
