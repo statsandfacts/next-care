@@ -111,6 +111,8 @@ class CasePage(BaseModel):
     case_id: str | None = None
     session_id: str | None = None
     created_date: str | None = None
+    remarks: str | None = None
+    doctor_edit_image_insights: str | None = None
 
 
 class PaginatedItemDoctorList(BaseModel):
@@ -135,6 +137,7 @@ class PatientDashboardResponse(BaseModel):
     diseases: str
     doctor_name: str
     created_date: str
+    case_status: str
 
 class PatientDashboardResponseList(BaseModel):
     cases: List[PatientDashboardResponse]
@@ -153,6 +156,7 @@ class ImagePath(BaseModel):
 
 
 class CaseReport(BaseModel):
+    insights: str
     image_path: List[ImagePath] = Field(..., alias="image_path")
     question_answers: List[Dict[str, Optional[str]]]
 

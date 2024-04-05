@@ -1,4 +1,4 @@
-import logging, json
+import logging, json, traceback
 from typing import Any, List, Optional
 
 from app import crud, models, schemas
@@ -204,6 +204,10 @@ def get_dashboard(user_id: str,
         )
     except HTTPException as e:
         return JSONResponse(content={"detail": str(e.detail), "status": e.status_code}, status_code=e.status_code)
+    except Exception as ex:
+        logger.error("ERROR while fetchng patient dashboard: ")
+        traceback.print_exc()
+        return JSONResponse(content={"detail": "Error fetching dashboard", "status": 500}, status_code=500)
 
 
 

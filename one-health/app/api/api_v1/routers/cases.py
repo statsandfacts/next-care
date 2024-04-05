@@ -41,11 +41,11 @@ def update_case(
 def create_case(case_details: CaseCreate, db: Session = Depends(get_db)
                 ) -> Any:
     try:
-        if (crud.casez.get_by_patient_user_id(db, user_id = case_details.patient_id)) is not None:
-            raise HTTPException(
-                status_code=409,
-                detail="The user already has a case created",
-            )
+        # if (crud.casez.get_by_patient_user_id(db, user_id = case_details.patient_id)) is not None:
+        #     raise HTTPException(
+        #         status_code=409,
+        #         detail="The user already has a case created",
+        #     )
         crud.casez.create(db, obj_in=case_details)
         return JSONResponse(content={"message": "Case created successfully", "status": 200}, status_code=200)
     except HTTPException as e:
@@ -96,7 +96,9 @@ def read_by_case_id(
             insights = case.insights,
             status= case.status,
             session_id=session_id,
-            created_at=case.created_at.strftime("%B %d, %Y")
+            created_at=case.created_at.strftime("%B %d, %Y"),
+            doctor_edit_image_insights = case.doctor_edit_image_insights,
+            remarks = case.remarks
         )
 
         return case_page

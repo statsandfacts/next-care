@@ -163,12 +163,16 @@ class CRUDCase(CRUDBase[Doctor, CaseCreate, CaseUpdate]):
                     UserUpload.user_id == case.patient_user_id).first()
                 diseases = upload_db.image_output_label
                 doctor_obj = db.query(User).filter(User.user_id == case.doctor_user_id).first()
-                doctor_name = doctor_obj.first_name + " " + doctor_obj.last_name
+                print("doctor_obj: ", doctor_obj)
+                doctor_name = ""
+                if doctor_obj:
+                    doctor_name = doctor_obj.first_name + " " + doctor_obj.last_name
                 case_page = PatientDashboardResponse(
                     case_id=case.case_id,
                     diseases=diseases,
                     doctor_name=doctor_name,
-                    created_date=case.created_at.strftime("%B %d, %Y")
+                    created_date=case.created_at.strftime("%B %d, %Y"),
+                    case_status= case.status
                 )
                 case_pages.append(case_page)
         return case_pages
@@ -194,6 +198,7 @@ class CRUDCase(CRUDBase[Doctor, CaseCreate, CaseUpdate]):
             question_ans = user_session.question_answers
 
         case_report = CaseReport(
+            insights= case.insights,
             image_path=mapped_values,
             question_answers=question_ans
         )
