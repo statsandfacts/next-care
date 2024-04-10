@@ -194,10 +194,11 @@ class CRUDCase(CRUDBase[Doctor, CaseCreate, CaseUpdate]):
 
         user_session = db.query(UserSession).filter(UserSession.user_id == case.patient_user_id).first()
         question_ans = [{}]
-        if user_session:
+        if user_session.question_answers:
             question_ans = user_session.question_answers
 
         case_report = CaseReport(
+            remarks= case.remarks,
             insights= case.insights,
             image_path=mapped_values,
             question_answers=question_ans
