@@ -41,7 +41,13 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
             db_obj = User()
             db_obj.government_id = obj_in.government_id
             db_obj.email_id = obj_in.email_id
-            #db_obj.user_type = obj_in.user_type
+            db_obj.user_type = obj_in.user_type
+            # if obj_in.user_type == "patient":
+            #     db_obj.user_type = "patient"
+            # elif obj_in.user_type == "doctor":
+            #     db_obj.user_type = "doctor"
+            # else:
+            #     db_obj.user_type = "admin"
             db_obj.government_idtype = obj_in.government_idtype
             db_obj.address = obj_in.address
             db_obj.last_name = obj_in.last_name
@@ -96,19 +102,22 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
             update_data = obj_in
         else:
             update_data = obj_in.dict(exclude_unset=True)
-        print("fewfewvrew: ", get_password_hash(update_data["password"]))
-        if obj_in.password and "password" in update_data:
+        #print("fewfewvrew: ", len(obj_in.password))
+        if len(obj_in.password) > 0 and "password" in update_data:
             hashed_password = get_password_hash(update_data["password"])
             del update_data["password"]
             update_data["password"] = hashed_password
-            try:
-                updated_user = super().update(db, db_obj=db_obj, obj_in=update_data)
-            except IntegrityError as ie:
-                logger.error("DB error occured", exc_info=True)
-                raise HTTPException(
-                    status_code=500,
-                    detail=str(ie.orig),
-                )
+        if len(obj_in.password) == 0:
+            update_data["password"] = db_obj.password
+
+        try:
+            updated_user = super().update(db, db_obj=db_obj, obj_in=update_data)
+        except IntegrityError as ie:
+            logger.error("DB error occured", exc_info=True)
+            raise HTTPException(
+                status_code=500,
+                detail=str(ie.orig),
+            )
         return updated_user
 
     def get_multi(
