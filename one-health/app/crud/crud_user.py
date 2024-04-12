@@ -41,7 +41,7 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
             db_obj = User()
             db_obj.government_id = obj_in.government_id
             db_obj.email_id = obj_in.email_id
-            db_obj.user_type = obj_in.user_type
+            #db_obj.user_type = obj_in.user_type
             db_obj.government_idtype = obj_in.government_idtype
             db_obj.address = obj_in.address
             db_obj.last_name = obj_in.last_name
@@ -54,6 +54,7 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
             user_role = UserRole()
             user_role.user_id = db_obj.user_id
             user_role.role_id = self.assign_roles(db_obj)
+            db_obj.user_type = user_role.role_id
             db_obj.user_role = user_role
 
             db.add(db_obj)
