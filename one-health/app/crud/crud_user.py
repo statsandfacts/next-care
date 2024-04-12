@@ -96,7 +96,7 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         else:
             update_data = obj_in.dict(exclude_unset=True)
         print("fewfewvrew: ", get_password_hash(update_data["password"]))
-        if get_password_hash(update_data["password"]) and "password" in update_data:
+        if obj_in.password and "password" in update_data:
             hashed_password = get_password_hash(update_data["password"])
             del update_data["password"]
             update_data["password"] = hashed_password
