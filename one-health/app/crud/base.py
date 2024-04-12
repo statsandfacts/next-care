@@ -88,7 +88,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
             items = db.query(self.model).filter(and_(self.model.user_type == "2", User.is_active == status)).offset(skip).limit(limit).all()
             print("if items:", items)
         else:
-            items = db.query(self.model).filter(and_(User.user_type == "doctor", User.is_active == status,
+            items = db.query(self.model).filter(and_(User.user_type == "2", User.is_active == status,
                                                      User.first_name.like(f'%{search_name}%'))).offset(skip).limit(
                 limit).all()
             print("else items:", items)
@@ -106,7 +106,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         """
         if status == 0:
             query = db.query(User).outerjoin(Doctor, User.user_id == Doctor.patient_user_id).filter(
-                User.user_type == "Patient")
+                User.user_type == "1")
 
             # Filter the results to include only those users not present in the Doctor table
             query = query.filter(or_(Doctor.patient_user_id == None, literal(False)))

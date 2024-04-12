@@ -157,6 +157,7 @@ class ImagePath(BaseModel):
 
 class CaseReport(BaseModel):
     insights: str
+    remarks: str
     image_path: List[ImagePath] = Field(..., alias="image_path")
     question_answers: List[Dict[str, Optional[str]]]
 
