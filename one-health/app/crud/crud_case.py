@@ -21,10 +21,10 @@ logger = logging.getLogger(__name__)
 class CRUDCase(CRUDBase[Doctor, CaseCreate, CaseUpdate]):
 
     def get_by_patient_user_id(self, db: Session, *, user_id: str) -> Optional[Doctor]:
-        return db.query(self.model).filter(Doctor.patient_user_id == user_id).first()
+        return db.query(self.model).filter(self.model.patient_user_id == user_id).first()
 
     def get_by_case_id(self, db: Session, *, case_id: str) -> Optional[Doctor]:
-        return db.query(self.model).filter(Doctor.case_id == case_id).first()
+        return db.query(self.model).filter(self.model.case_id == case_id).first()
 
     def create(self, db: Session, *, obj_in: CaseCreate) -> Doctor:
 
@@ -186,6 +186,8 @@ class CRUDCase(CRUDBase[Doctor, CaseCreate, CaseUpdate]):
             )
         user_upload = db.query(UserUpload).filter(
             UserUpload.case_id == case.case_id).first()
+
+        #if case.rem
 
         image_path_list = user_upload.image_path.split(',') # change single list logic here
         image_output_label_list = user_upload.image_output_label.split(',')
