@@ -11,7 +11,7 @@ class Doctor(Base):
     """
        Database Model for an application Doctor cases
        """
-    __tablename__ = "Doctor"
+    __tablename__ = "doctor"
     case_id = Column(CHAR(36), primary_key=True, index=True, default=uuid4)
     sec_case_id = Column(CHAR(36), index=True, default=uuid4)
     doctor_user_id = Column(String(255), index=True)
