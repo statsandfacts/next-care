@@ -35,4 +35,4 @@ class UserUpload(Base):
     )
 
     user = relationship("User", back_populates="user_upload", uselist=False)
-    doctor = relationship("doctor", back_populates="user_uploads", uselist=False)
+    doctor = relationship("Doctor", back_populates="user_uploads", uselist=False)

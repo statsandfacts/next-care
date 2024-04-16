@@ -11,7 +11,7 @@ class Doctor(Base):
     """
        Database Model for an application Doctor cases
        """
-    __tablename__ = "doctor"
+    __tablename__ = "Doctor"
     case_id = Column(CHAR(36), primary_key=True, index=True, default=uuid4)
     sec_case_id = Column(CHAR(36), index=True, default=uuid4)
     doctor_user_id = Column(String(255), index=True)
@@ -33,7 +33,7 @@ class Doctor(Base):
     user_uploads = relationship(
         "UserUpload",
         back_populates="doctor",
-        primaryjoin="doctor.case_id == UserUpload.case_id",
+        primaryjoin="Doctor.case_id == UserUpload.case_id",
         cascade="all, delete-orphan, save-update",
         uselist=False
     )
