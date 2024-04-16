@@ -34,7 +34,7 @@ class Doctor(Base):
         "UserUpload",
         back_populates="doctor",
         primaryjoin="Doctor.case_id == UserUpload.case_id",
-        cascade="all, delete-orphan",
+        cascade="all, delete-orphan, save-update",
         uselist=False
     )
 
