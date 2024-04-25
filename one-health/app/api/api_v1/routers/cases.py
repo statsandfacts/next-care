@@ -24,7 +24,7 @@ def update_case(
         """
         try:
             logger.info("patient user id ------> %s", case_update_details.patient_user_id)
-            case = crud.casez.get_by_patient_user_id(db, user_id = case_update_details.patient_user_id)
+            case = crud.casez.get_by_case_id(db, case_id = case_update_details.case_id)
             if not case:
                 raise HTTPException(
                     status_code=404,
