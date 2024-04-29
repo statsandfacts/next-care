@@ -10,6 +10,8 @@ ENV PYTHONUNBUFFERED 1
 # Set the working directory in the container
 WORKDIR /app
 
+RUN pip3 install --upgrade pip setuptools
+
 # Install system dependencies
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
