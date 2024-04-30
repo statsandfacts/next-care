@@ -15,8 +15,10 @@ RUN pip3 install --upgrade pip setuptools
 # Install system dependencies
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-        gcc \
-        libpq-dev \
+    mysql-client \
+    libmysqlclient-dev \
+    gcc \
+    libpq-dev \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
