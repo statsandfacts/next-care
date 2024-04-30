@@ -1,6 +1,3 @@
-# Use the official Python image as the base image
-FROM python:3.9-slim
-
 # Set environment variables
 ENV MYSQLCLIENT_CFLAGS="-I/usr/include/mysql"
 ENV MYSQLCLIENT_LDFLAGS="-L/usr/lib/x86_64-linux-gnu -lmysqlclient"
@@ -10,19 +7,14 @@ ENV PYTHONUNBUFFERED 1
 # Set the working directory in the container
 WORKDIR /app
 
-RUN pip3 install --upgrade pip setuptools
-
 # Install system dependencies
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
+RUN apt-get update && apt-get install -y \
     mysql-client \
     libmysqlclient-dev \
-    gcc \
-    libpq-dev \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+    gcc
 
-RUN pip3 install mysqlclient
+# Install Python packages with mysqlclient and specify include directory
+RUN pip3 install --no-cache-dir --global-option=build_ext --global-option="-I/usr/include/mysql" mysqlclient
 
 # Copy the requirements file
 COPY requirements.txt .
