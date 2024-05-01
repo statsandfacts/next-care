@@ -14,9 +14,8 @@ WORKDIR /app
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         gcc \
-        g++ \               # Added g++ for libsvm
-        libpq-dev \
-        libmysqlclient-dev \ # Added libmysqlclient-dev for mysqlclient
+        g++ \
+        libmysqlclient-dev \ # Install libmysqlclient-dev for MySQL
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
