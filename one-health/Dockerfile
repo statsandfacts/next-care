@@ -14,7 +14,7 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends \
         gcc \
         g++ \
-        libmysqlclient-dev \
+        libmariadb-dev-compat \ # Use libmariadb-dev-compat as an alternative
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
