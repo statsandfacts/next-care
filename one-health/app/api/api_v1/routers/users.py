@@ -321,11 +321,11 @@ def get_doctor_list(doctor_user_id: str,
     )
 
 @router.get("/get-user-responses", response_model=GetUserResponse)
-def get_user_response(session_id: str,
-        user_id: str,
-        db: Session = Depends(get_db)):
+def get_user_response(user_id: str,
+session_id: Optional[str] = None,
+db: Session = Depends(get_db)):
     try:
-        user_session = crud.user_session.get_by_session_id(db, session_id=session_id,
+        user_session = crud.user_session.get_by_session_id_l(db, session_id=session_id,
                                                            user_id=user_id)
         if not user_session:
             raise HTTPException(
@@ -341,7 +341,7 @@ def get_user_response(session_id: str,
 def save_user_response(user_response : SaveUserResponse, db: Session = Depends(get_db)
 ) -> Any:
     try:
-        user_session = crud.user_session.get_by_session_id(db, session_id=user_response.session_id,
+        user_session = crud.user_session.get_by_session_id_l(db, session_id=user_response.session_id,
                                                            user_id=user_response.user_id)
         if not user_session:
             raise HTTPException(

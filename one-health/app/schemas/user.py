@@ -1,5 +1,4 @@
-from datetime import datetime
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict, Any, Union
 
 from app.schemas.user_role import UserRole
 from pydantic import UUID4, BaseModel, EmailStr, Field
@@ -30,6 +29,11 @@ class UserCreate(UserBase):
     specialization: str
     gender: str
     dob: str
+    state: str
+    govt_id_image: str
+    zipcode: str
+    city: str
+
 
 
 class UserLogin(UserBase):
@@ -46,24 +50,28 @@ class UserLogOut(UserBase):
 # Properties to receive via API on update
 class UserUpdate(UserBase):
     user_id: str
-    password: str | None = None
-    email_id: str | None = None
-    phone_number: str | None = None
-    address: str | None = None
-    qualification: str | None = None
-    specialization: str | None = None
+    password: Union[str, None] = None
+    email_id: Union[str, None] = None
+    phone_number: Union[str, None] = None
+    address: Union[str, None] = None
+    qualification: Union[str, None] = None
+    specialization: Union[str, None] = None
+    state: Union[str, None] = None
+    govt_id_image: Union[str, None] = None
+    zipcode: Union[str, None] = None
+    city: Union[str, None] = None
 
 
 class UserInDBBase(UserBase):
     user_id: UUID4
     # user_role: Optional[UserRole]
-    created_at: datetime | None = None
-    updated_at: datetime | None = None
-    address: str | None = None
-    qualification: str | None = None
-    specialization: str | None = None
-    status: str | None = None
-    doctor_user_id: str | None = None
+    # created_at: datetime | None = None
+    # updated_at: datetime | None = None
+    address: Union[str, None] = None
+    qualification: Union[str, None] = None
+    specialization: Union[str, None] = None
+    status: Union[str, None] = None
+    doctor_user_id: Union[str, None] = None
 
     class Config:
         orm_mode = True
@@ -71,8 +79,8 @@ class UserInDBBase(UserBase):
 
 # Additional properties to return via API
 class User(UserInDBBase):
-    dob: str | None = None
-    gender: str | None = None
+    dob: Union[str, None] = None
+    gender: Union[str, None] = None
     pass
 
 
@@ -97,22 +105,22 @@ class CaseCreate(BaseModel):
 class CaseUpdate(BaseModel):
     doctor_user_id: str
     patient_user_id: str
-    insights: str | None = None
-    remarks: str | None = None
+    insights: Union[str, None] = None
+    remarks: Union[str, None] = None
     status: str
     case_id: str
-    doctor_edit_image_insights: str | None = None
+    doctor_edit_image_insights: Union[str, None] = None
 
 class CasePage(BaseModel):
-    doctor_user_id: str  | None = None
-    patient_user_id: str | None = None
-    insights: str | None = None
-    status: str | None = None
-    case_id: str | None = None
-    session_id: str | None = None
-    created_date: str | None = None
-    remarks: str | None = None
-    doctor_edit_image_insights: str | None = None
+    doctor_user_id: Union[str, None] = None
+    patient_user_id: Union[str, None] = None
+    insights: Union[str, None] = None
+    status: Union[str, None] = None
+    case_id: Union[str, None] = None
+    session_id: Union[str, None] = None
+    created_date: Union[str, None] = None
+    remarks: Union[str, None] = None
+    doctor_edit_image_insights: Union[str, None] = None
 
 
 class PaginatedItemDoctorList(BaseModel):
@@ -125,7 +133,8 @@ class PaginatedItemDoctorList(BaseModel):
 class SaveUserResponse(BaseModel):
     session_id: str
     user_id: str
-    question_answers: List[Dict[str, Optional[str]]] | None = None
+    #question_answers: List[Dict[str, Optional[str]]] | None = None
+    question_answers: Union[List[Dict[str, Optional[str]]], None] = None
 
 
 class GetUserResponse(BaseModel):
