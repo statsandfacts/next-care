@@ -16,6 +16,10 @@ class CRUDSession(CRUDBase[UserSession, SaveUserResponse, SaveUserResponse]):
     def get_by_session_id(self, db: Session, *, session_id: str, user_id: str) -> Optional[UserSession]:
         return db.query(self.model).filter(UserSession.session_id == session_id, UserSession.user_id == user_id).first()
 
+    def get_by_session_id_l(self, db: Session, *, session_id: str, user_id: str) -> Optional[UserSession]:
+        return db.query(self.model).filter(
+            (UserSession.session_id == session_id) | (UserSession.user_id == user_id)).first()
+
     def get_by_user_id(self, db: Session, *, user_id: str) -> Optional[UserSession]:
         return db.query(self.model).filter(UserSession.user_id == user_id).first()
 

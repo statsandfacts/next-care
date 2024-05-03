@@ -56,6 +56,12 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
             db_obj.password = get_password_hash(obj_in.password)
             db_obj.specialization = obj_in.specialization
             db_obj.phone_number = obj_in.phone_number
+            db_obj.govt_id_image = obj_in.govt_id_image
+            db_obj.state = obj_in.state
+            db_obj.zipcode = obj_in.zipcode
+            db_obj.city = obj_in.city
+            db_obj.gender = obj_in.gender
+            db_obj.dob = obj_in.dob
 
             user_role = UserRole()
             user_role.user_id = db_obj.user_id
