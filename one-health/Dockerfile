@@ -29,4 +29,4 @@ COPY . .
 
 # Run the FastAPI application with Uvicorn server
 #CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
-CMD ["uvicorn", "main:app", "--host", "3.128.66.119", "--port", "8000", "--ssl-keyfile=certificate/generated-private-key.txt", "--ssl-certfile=certificate/9a07b3ec74f104e1.crt"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--ssl-keyfile=certificate/generated-private-key.txt", "--ssl-certfile=certificate/9a07b3ec74f104e1.crt"]
