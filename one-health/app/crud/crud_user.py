@@ -13,6 +13,7 @@ from app.schemas.user import UserCreate, UserUpdate
 from pydantic.types import UUID4
 from sqlalchemy.orm import Session
 from sqlalchemy import or_
+from app.core import security
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -109,12 +110,33 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         else:
             update_data = obj_in.dict(exclude_unset=True)
         #print("fewfewvrew: ", len(obj_in.password))
-        if len(obj_in.password) > 0 and "password" in update_data:
-            hashed_password = get_password_hash(update_data["password"])
+
+        if len(obj_in.password) > 0:
+            if not update_data["new_password"]:
+                raise HTTPException(
+                    status_code=409,
+                    detail="Changing password requires new_password field",
+                )
+
+            if security.verify_password(update_data["password"], db_obj.password) is False:
+                raise HTTPException(
+                    status_code=409,
+                    detail="Old password does not match",
+                )
+            hashed_password = get_password_hash(update_data["new_password"])
             del update_data["password"]
             update_data["password"] = hashed_password
-        if len(obj_in.password) == 0:
+
+        else:
             update_data["password"] = db_obj.password
+
+
+        # if len(obj_in.password) > 0 and "password" in update_data:
+        #     hashed_password = get_password_hash(update_data["password"])
+        #     del update_data["password"]
+        #     update_data["password"] = hashed_password
+        # if len(obj_in.password) == 0:
+        #     update_data["password"] = db_obj.password
 
         try:
             updated_user = super().update(db, db_obj=db_obj, obj_in=update_data)

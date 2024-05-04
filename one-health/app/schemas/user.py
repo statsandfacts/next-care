@@ -60,6 +60,7 @@ class UserUpdate(UserBase):
     govt_id_image: Union[str, None] = None
     zipcode: Union[str, None] = None
     city: Union[str, None] = None
+    new_password: Union[str, None] = None
 
 
 class UserInDBBase(UserBase):
