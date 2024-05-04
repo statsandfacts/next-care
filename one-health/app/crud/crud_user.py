@@ -112,7 +112,7 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         #print("fewfewvrew: ", len(obj_in.password))
 
         if len(obj_in.password) > 0:
-            if "new_password" not in update_data and not update_data["new_password"]:
+            if not update_data["new_password"]:
                 raise HTTPException(
                     status_code=409,
                     detail="Changing password requires new_password field",
