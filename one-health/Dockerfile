@@ -28,4 +28,5 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Run the FastAPI application with Uvicorn server
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+#CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--ssl-keyfile=/next-care/one-health/certificate/generated-private-key.txt", "--ssl-certfile=/next-care/one-health/certificate/9a07b3ec74f104e1.crt"]
