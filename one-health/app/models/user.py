@@ -31,6 +31,7 @@ class  User(Base):
     dob = Column(String(50), index=True)
     specialization = Column(String(255), index=True)
     is_active = Column(Boolean(), default=True)
+    user_profile_image_path = Column(String(100), index=True)
     created_at = Column(
         TIMESTAMP(timezone=True),
         server_default=func.now()
