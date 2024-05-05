@@ -61,12 +61,12 @@ def read_all_mappings(db: Session = Depends(get_db)):
 @router.post("/mapping")
 def create_mapping(diagnose_details: CreateDiagnosis, db: Session = Depends(get_db)
 ) -> Any:
-    try:
+    #try:
         crud.diagnosis.create_mapping(db, diagnose_details.visit, diagnose_details.diagnosis, diagnose_details.medicine,
                                       diagnose_details.company, diagnose_details.dosage)
         return JSONResponse(content={"message": "mapping created successfully", "status": 200}, status_code=200)
-    except Exception as ex:
-        return JSONResponse(content={"detail": "Error while creating mapping", "status": 500}, status_code=500)
+    # except Exception as ex:
+    #     return JSONResponse(content={"detail": "Error while creating mapping", "status": 500}, status_code=500)
 
 
 
