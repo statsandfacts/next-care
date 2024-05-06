@@ -111,7 +111,7 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
             update_data = obj_in.dict(exclude_unset=True)
         #print("fewfewvrew: ", len(obj_in.password))
 
-        if len(obj_in.password) > 0:
+        if len(obj_in.password) > 0 and 'new_password' in update_data:
             if not update_data["new_password"]:
                 raise HTTPException(
                     status_code=409,
