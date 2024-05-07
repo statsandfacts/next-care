@@ -16,11 +16,20 @@ class CRUDDiagnosisMedicine(CRUDBase[DiagnosisMedicineMapping, CreateDiagnosis, 
     def get_mapping(self, db: Session, mapping_id: str) -> Optional[DiagnosisMedicineMapping]:
         return db.query(DiagnosisMedicineMapping).filter(DiagnosisMedicineMapping.mapping_id == mapping_id).first()
 
+    def get_mapping_by_visit_diagnosis(self, db: Session, visit: str, diagnosis: str):
+        return db.query(DiagnosisMedicineMapping).filter(
+            DiagnosisMedicineMapping.visit == visit,
+            DiagnosisMedicineMapping.diagnosis == diagnosis
+        ).first()
+
     def get_all_mappings(self, db: Session) -> List[DiagnosisMedicineMapping]:
         return db.query(DiagnosisMedicineMapping).all()
 
     def create_mapping(self, db: Session, visit: str, diagnosis: str, medicine: str, company: str,
                        dosage: str) -> DiagnosisMedicineMapping:
+
+        if not self.get_mapping_by_visit_diagnosis(db, visit, diagnosis):
+            raise HTTPException(status_code=404, detail="visit and diagnosis combination mapping already exist")
         new_mapping = DiagnosisMedicineMapping(visit=visit, diagnosis=diagnosis, medicine=medicine, company=company,
                                                dosage=dosage)
         db.add(new_mapping)
