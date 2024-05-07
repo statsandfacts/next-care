@@ -61,6 +61,7 @@ class UserUpdate(UserBase):
     zipcode: Union[str, None] = None
     city: Union[str, None] = None
     new_password: Union[str, None] = None
+    user_profile_image_path: Union[str, None] = None
 
 
 class UserInDBBase(UserBase):
@@ -82,7 +83,11 @@ class UserInDBBase(UserBase):
 class User(UserInDBBase):
     dob: Union[str, None] = None
     gender: Union[str, None] = None
-    pass
+    govt_id_image: Union[str, None] = None
+    zipcode: Union[str, None] = None
+    city: Union[str, None] = None
+    new_password: Union[str, None] = None
+    user_profile_image_path: Union[str, None] = None
 
 
 # Additional properties stored in DB
