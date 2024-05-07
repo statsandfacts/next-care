@@ -1,15 +1,37 @@
 from pydantic import BaseModel
-
+from sqlalchemy import create_engine, Column, String, Integer,Boolean, ForeignKey
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import Session,sessionmaker, relationship
+from sqlalchemy.ext.declarative import declarative_base
+from typing import List,Optional
+Base = declarative_base()
 
 class QuestionSequenceLayout(BaseModel):
-    KC1: str = None
-    KC2: str = None
-    KC3: str = None
-    KC4: str = None
-    KC5: str = None
-    KC6: str = None
-    KC7: str = None
-    KC8: str = None
-    KC9: str = None
-    KC10: str = None
+    KC1: Optional[str] = None
+    KC2: Optional[str] = None
+    KC3: Optional[str] = None
+    KC4: Optional[str] = None
+    KC5: Optional[str] = None
+    KC6: Optional[str] = None
+    KC7: Optional[str] = None
+    KC8: Optional[str] = None
+    KC9: Optional[str] = None
+    KC10: Optional[str] = None
     question_sequence_Array: list[dict[str, int]]
+
+class QuestionSequenceLayoutDB(Base):
+    __tablename__ = 'Question_sequence_layout'
+
+    KC1 = Column(String(255))
+    KC2 = Column(String(255))
+    KC3 = Column(String(255))
+    KC4 = Column(String(255))
+    KC5 = Column(String(255))
+    KC6 = Column(String(255))
+    KC7 = Column(String(255))
+    KC8 = Column(String(255))
+    KC9 = Column(String(255))
+    KC10 = Column(String(255))
+    question_id = Column(Integer)
+    sequence = Column(Integer, primary_key=True)
+    key_combination = Column(String(255), primary_key=True)
