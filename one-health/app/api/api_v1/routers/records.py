@@ -46,6 +46,8 @@ def delete_records(key_combination: str, db: Session = Depends(deps.get_db)):
 @router.get("/show_records")
 async def show_records(key_combination: str, db: Session = Depends(deps.get_db)):
     try:
-        return JSONResponse(content={"records": get_records(key_combination, db), "status": 200}, status_code=200)
+        records = get_records(key_combination, db)
+        serialized_records = [record.to_dict() for record in records]
+        return JSONResponse(content={"records": serialized_records, "status": 200}, status_code=200)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to update data: {str(e)}")  

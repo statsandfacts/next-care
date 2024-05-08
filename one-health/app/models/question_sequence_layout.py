@@ -35,3 +35,21 @@ class QuestionSequenceLayoutDB(Base):
     question_id = Column(Integer)
     sequence = Column(Integer, primary_key=True)
     key_combination = Column(String(255), primary_key=True)
+
+    def to_dict(self):
+        return {
+            'KC1': self.KC1,
+            'KC2': self.KC2,
+            'KC3': self.KC3,
+            'KC4': self.KC4,
+            'KC5': self.KC5,
+            'KC6': self.KC6,
+            'KC7': self.KC7,
+            'KC8': self.KC8,
+            'KC9': self.KC9,
+            'KC10': self.KC10,
+            'question_id': self.question_id,
+            'sequence': self.sequence,
+            'key_combination': self.key_combination
+            # Include other attributes here
+        }
