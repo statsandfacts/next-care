@@ -8,6 +8,7 @@ from app.api.deps import get_db
 from fastapi import Depends
 from sqlalchemy.orm import Session,sessionmaker
 from app.api import deps
+from starlette.responses import JSONResponse
 
 router = APIRouter(prefix="/master_questionnaire", tags=["master_questionnaire"])
 
@@ -15,7 +16,7 @@ router = APIRouter(prefix="/master_questionnaire", tags=["master_questionnaire"]
 async def ingest_questionnaire(data: Dict, db: Session = Depends(deps.get_db)):
     try:
         ingest_data(data,db)
-        return {"message": "Data ingested successfully"}
+        return JSONResponse(content={"message": "Data ingested successfully", "status": 200}, status_code=200)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to ingest data: {str(e)}")
 
@@ -24,7 +25,7 @@ async def ingest_questionnaire(data: Dict, db: Session = Depends(deps.get_db)):
 def get_questionnaires(db: Session = Depends(deps.get_db)):
     try:
         questionnaires = get_all_questionnaires(db)
-        return questionnaires
+        return JSONResponse(content={"questionnaires": questionnaires, "status": 200}, status_code=200)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to fetch questionnaires: {str(e)}")
 
@@ -33,7 +34,7 @@ def get_questionnaires(db: Session = Depends(deps.get_db)):
 def update_questionnaire_detail(question_id: int, updated_data: dict, db: Session = Depends(deps.get_db)):
     try:
         update_questionnaire(question_id, updated_data, db)
-        return {"message": "Questionnaire updated successfully"}
+        return JSONResponse(content={"message": "Questionnaire updated successfully", "status": 200}, status_code=200)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to update questionnaire: {str(e)}")
 
@@ -42,7 +43,7 @@ def update_questionnaire_detail(question_id: int, updated_data: dict, db: Sessio
 def delete_questionnaire_details(question_id: int, db: Session = Depends(deps.get_db)):
     try:
         delete_questionnaire(question_id, db)
-        return {"message": f"Questionnaire with ID {question_id} deleted successfully"}
+        return JSONResponse(content={"message": f"Questionnaire with ID {question_id} deleted successfully", "status": 200}, status_code=200)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to delete questionnaire: {str(e)}")
 
@@ -51,6 +52,8 @@ def delete_questionnaire_details(question_id: int, db: Session = Depends(deps.ge
 def get_questions_by_ids_details(question_ids: dict, db: Session = Depends(deps.get_db)):
     try:
         questions = get_questions_by_ids(question_ids['question_ids'], db)
-        return questions
+        return JSONResponse(
+            content={"questions": questions, "status": 200},
+            status_code=200)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to fetch questions: {str(e)}")

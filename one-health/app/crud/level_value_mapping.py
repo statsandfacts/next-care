@@ -1,3 +1,5 @@
+from http.client import HTTPException
+
 from app.models.level_value_mapping import LevelValueMapping, LevelValueMappingDB
 from fastapi import Depends
 from sqlalchemy.orm import Session

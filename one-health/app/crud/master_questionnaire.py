@@ -98,7 +98,8 @@ def get_questions_by_ids(question_ids: List[int], db: Session) -> List[dict]:
         question_data = {
             "question_id": question.question_id,
             "question_type": question.question_type,
-            "allowed_values": allowed_values[0] if allowed_values else []
+            "allowed_values": allowed_values[0] if allowed_values else [],
+            "multiple_val_allowed":question.question_values
         }
         all_data.append(question_data)
     return all_data

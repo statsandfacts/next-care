@@ -9,6 +9,7 @@ from app.api.deps import get_db
 from fastapi import Depends
 from sqlalchemy.orm import Session,sessionmaker
 from app.api import deps
+from starlette.responses import JSONResponse
 
 router = APIRouter(prefix="/records", tags=["records"])
 
@@ -26,7 +27,7 @@ async def cerate_records_seq_layout(data: List[QuestionSequenceLayout], db: Sess
 def update_records(key_combination: str, new_data: QuestionSequenceLayout, db: Session = Depends(deps.get_db)):
     try:
         upsert_records(key_combination, new_data, db)
-        return {"message": "Record updated successfully"}
+        return JSONResponse(content={"message": "Record updated successfully", "status": 200}, status_code=200)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to update data: {str(e)}")
 
@@ -35,7 +36,7 @@ def update_records(key_combination: str, new_data: QuestionSequenceLayout, db: S
 def delete_records(key_combination: str, db: Session = Depends(deps.get_db)):
     try:
         del_records(key_combination, db)
-        return {"message": "Record deleted successfully"}
+        return JSONResponse(content={"message": "Record deleted successfully", "status": 200}, status_code=200)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to update data: {str(e)}")
 
@@ -45,6 +46,6 @@ def delete_records(key_combination: str, db: Session = Depends(deps.get_db)):
 @router.get("/show_records")
 async def show_records(key_combination: str, db: Session = Depends(deps.get_db)):
     try:
-        return get_records(key_combination, db)
+        return JSONResponse(content={"records": get_records(key_combination, db), "status": 200}, status_code=200)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to update data: {str(e)}")  
