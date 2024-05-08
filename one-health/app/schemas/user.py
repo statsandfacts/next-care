@@ -192,3 +192,12 @@ class DiagnosisMedicineReport(BaseModel):
     date: str
     diagnosis_medicines: List[DiagnosisMedicine]
 
+
+class QuestionAbbreviationMapBase(BaseModel):
+    question_id: int
+    question: str
+    answer: str
+    abbreviation: str
+
+class QuestionAbbreviationMapCreate(QuestionAbbreviationMapBase):
+    pass
