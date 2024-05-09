@@ -63,12 +63,12 @@ def get_questions_by_ids_details(question_ids: dict, db: Session = Depends(deps.
 
 
 @router.post("/add-abbreviation/")
-def create_question_abbreviation(question: QuestionAbbreviationMapCreate, db: Session = Depends(get_db)):
+def create_question_abbreviations(question: QuestionAbbreviationMapBase, db: Session = Depends(get_db)):
     try:
         create_question_abbreviation(db, question)
         return JSONResponse(content={"message": "abbreviations added successfully", "status": 200}, status_code=200)
-    except HTTPException as e:
-        return JSONResponse(content={"detail": str(e.detail), "status": e.status_code}, status_code=e.status_code)
+    except Exception as e:
+        return JSONResponse(content={"detail": "Error in adding record", "status": 500}, status_code=500)
 
 
 @router.get("/get-abbreviation/")
@@ -100,7 +100,7 @@ def get_question_abbreviation_by_question(
         return JSONResponse(content={"detail": str(e.detail), "status": e.status_code}, status_code=e.status_code)
 
 @router.get("/abbreviation/all", response_model=List[QuestionAbbreviationMapBase])
-def read_all_questions(db: Session = Depends(get_db)):
+def read_all_questionss(db: Session = Depends(get_db)):
     return get_all_question_abbreviations(db)
 
 @router.put("/update-abbreviation/", response_model=QuestionAbbreviationMapBase)
@@ -108,10 +108,10 @@ def update_question(question_id: int, updated_question: str, updated_answer: str
     try:
         question = update_question_abbreviation(db, question_id, updated_question, updated_answer, abbreviation)
         if not question:
-            raise HTTPException(status_code=404, detail="Question not found")
+            return JSONResponse(content={"message": "No abbreviation data found for this request", "status": 400}, status_code=400)
         return JSONResponse(content={"message": "abbreviations updated successfully", "status": 200}, status_code=200)
-    except HTTPException as e:
-        return JSONResponse(content={"detail": str(e.detail), "status": e.status_code}, status_code=e.status_code)
+    except Exception as e:
+        return JSONResponse(content={"detail": "Error in updating abbriviation", "status": e.status_code}, status_code=e.status_code)
 
 @router.delete("/delete-abbreviation/")
 def delete_question(question_id: int, db: Session = Depends(get_db)):

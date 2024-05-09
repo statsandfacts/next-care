@@ -1,14 +1,25 @@
+import logging
 from http.client import HTTPException
 
 from sqlalchemy.orm import Session
+from app.schemas.user import QuestionAbbreviationMapBase
 from app.models.QuestionAbbreviationMap import QuestionAbbreviationMap
 
-def create_question_abbreviation(db: Session, question: QuestionAbbreviationMap):
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+def create_question_abbreviation(db: Session, question: QuestionAbbreviationMapBase):
     try:
-        db.add(question)
+        db_obj = QuestionAbbreviationMap()
+        db_obj.question_id = question.question_id
+        db_obj.question = question.question
+        db_obj.answer = question.answer
+        db_obj.abbreviation = question.abbreviation
+        db.add(db_obj)
         db.commit()
-        db.refresh(question)
+        db.refresh(db_obj)
     except Exception as e:
+        logger.info("error in creating abbrevation: ", str(e))
         db.rollback()
         raise HTTPException(status_code=500, detail=f"Failed to ingest data: {str(e)}")
     finally:
@@ -40,6 +51,7 @@ def update_question_abbreviation(db: Session, question_id: int, updated_question
             db.commit()
         return question
     except Exception as e:
+        logger.info("error in updating abbrevation: ", str(e))
         db.rollback()
         raise HTTPException(status_code=500, detail=f"Failed to update abbreviation data: {str(e)}")
     finally:
