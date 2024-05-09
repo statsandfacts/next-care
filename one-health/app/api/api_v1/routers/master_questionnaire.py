@@ -101,7 +101,8 @@ def get_question_abbreviation_by_question(
 
 @router.get("/abbreviation/all", response_model=List[QuestionAbbreviationMapBase])
 def read_all_questionss(db: Session = Depends(get_db)):
-    return get_all_question_abbreviations(db)
+    abbreviations = [abbrev.to_dict() for abbrev in get_all_question_abbreviations(db)]
+    return JSONResponse(content={"abbreviations": abbreviations, "status": 200}, status_code=200)
 
 @router.put("/update-abbreviation/", response_model=QuestionAbbreviationMapBase)
 def update_question(question_id: int, updated_question: str, updated_answer: str, abbreviation: str, db: Session = Depends(get_db)):

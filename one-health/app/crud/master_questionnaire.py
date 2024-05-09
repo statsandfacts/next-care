@@ -52,7 +52,7 @@ def get_all_questionnaires(db: Session) -> List[dict]:
                 {
                     "value_id": value.value_id,
                     "question_id": value.question_id,
-                    "allowed_values": allowed_values
+                    "allowed_values": [item for sublist in allowed_values for item in sublist.split(',')]
                 } for value in values
             ]
         }
