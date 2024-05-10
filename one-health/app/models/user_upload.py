@@ -33,6 +33,8 @@ class UserUpload(Base):
         server_default=func.now(),
         onupdate=func.now()
     )
+    created_by = Column(CHAR(36), index=True)
+    updated_by = Column(CHAR(36), index=True)
 
     user = relationship("User", back_populates="user_upload", uselist=False)
     doctor = relationship("Doctor", back_populates="user_uploads", uselist=False)

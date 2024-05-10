@@ -41,6 +41,8 @@ class  User(Base):
         server_default=func.now(),
         onupdate=func.now()
     )
+    created_by = Column(CHAR(36), index=True)
+    updated_by = Column(CHAR(36), index=True)
 
 
     #user_role = relationship("UserRole", back_populates="user", uselist=False)

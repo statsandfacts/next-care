@@ -1,9 +1,10 @@
 from pydantic import BaseModel
-from sqlalchemy import create_engine, Column, String, Integer,Boolean, ForeignKey
+from sqlalchemy import create_engine, Column, String, Integer,Boolean, ForeignKey, func
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session,sessionmaker, relationship
 from sqlalchemy.ext.declarative import declarative_base
 from typing import List,Optional
+from sqlalchemy.dialects.mysql import CHAR, TIMESTAMP
 Base = declarative_base()
 
 class QuestionSequenceLayout(BaseModel):
@@ -35,6 +36,17 @@ class QuestionSequenceLayoutDB(Base):
     question_id = Column(Integer)
     sequence = Column(Integer, primary_key=True)
     key_combination = Column(String(255), primary_key=True)
+    created_at = Column(
+        TIMESTAMP(timezone=True),
+        server_default=func.now()
+    )
+    updated_at = Column(
+        TIMESTAMP(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now()
+    )
+    created_by = Column(CHAR(36), index=True)
+    updated_by = Column(CHAR(36), index=True)
 
     def to_dict(self):
         return {

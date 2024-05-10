@@ -80,11 +80,10 @@ def update_questionnaire(question_id: int, updated_data: dict, db: Session):
     db.close()
 
 def delete_questionnaire(question_id: int, db: Session):
-    # Delete MasterQuestionnaire
-    db.query(MasterQuestionnaire).filter(MasterQuestionnaire.question_id == question_id).delete()
-    
     # Delete associated QuestionValues
     db.query(QuestionValue).filter(QuestionValue.question_id == question_id).delete()
+    # Delete MasterQuestionnaire
+    db.query(MasterQuestionnaire).filter(MasterQuestionnaire.question_id == question_id).delete()
 
     db.commit()
     db.close()
