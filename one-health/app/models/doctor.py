@@ -1,10 +1,11 @@
-from sqlalchemy import Column, String, func
+from sqlalchemy import Column, String, func, event
 import datetime
 
 from app.db.base_class import Base
 from sqlalchemy.dialects.mysql import CHAR, TIMESTAMP
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, Session
 from uuid import uuid4
+from app.db.session import SessionLocal
 
 
 class Doctor(Base):
@@ -12,7 +13,7 @@ class Doctor(Base):
        Database Model for an application Doctor cases
        """
     __tablename__ = "Doctor"
-    case_id = Column(CHAR(36), primary_key=True, index=True, default=uuid4)
+    case_id = Column(CHAR(36), primary_key=True, index=True)
     sec_case_id = Column(CHAR(36), index=True, default=uuid4)
     doctor_user_id = Column(String(255), index=True)
     patient_user_id = Column(String(255), index=True)
@@ -39,4 +40,28 @@ class Doctor(Base):
         cascade="all, delete-orphan, save-update",
         uselist=False
     )
+
+
+def generate_case_id(session: Session) -> str:
+    prefix = "NXTCR"
+    last_case = session.query(Doctor).filter(Doctor.case_id.like(f"{prefix}%")).order_by(Doctor.case_id.desc()).first()
+
+    if last_case:
+        last_id = int(last_case.case_id.replace(prefix, ""))
+        new_id = last_id + 1
+    else:
+        new_id = 1
+
+    return f"{prefix}{new_id:013d}"
+
+
+@event.listens_for(Doctor, "before_insert")
+def set_case_id(mapper, connection, target):
+    session = SessionLocal()
+    try:
+        target.case_id = generate_case_id(session)
+    finally:
+        session.close()
+
+
 

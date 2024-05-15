@@ -2,7 +2,7 @@ import logging
 
 from sqlalchemy.orm import Session
 from app.schemas.user import CaseCreate, CaseUpdate, PatientDashboardResponse, PatientDashboardResponseList, ImagePath, \
-    CaseReport, CaseReportResponse, DiagnosisMedicine, DiagnosisMedicineReport
+    CaseReport, CaseReportResponse, DiagnosisMedicine, DiagnosisMedicineReport, PaginatedItemDoctorList
 from app.models.doctor import Doctor
 from app.models.user_upload import UserUpload
 from app.models.user_session import UserSession
@@ -87,24 +87,37 @@ class CRUDCase(CRUDBase[Doctor, CaseCreate, CaseUpdate]):
     def get_doctor_list(self, db: Session, status: int, doctor_user_id: str, skip: int = 0, limit: int = 10) -> List[
         Dict]:
         case_items = []
+        total_len = 0
         print("doc id: ", doctor_user_id)
         if not status and not doctor_user_id:
-            case_items = db.query(self.model).all()
+            query = db.query(self.model)
+            total_len = query.count()
+            case_items = query.offset(skip).limit(limit).all()
             print("if case items", case_items)
             item_dicts = [item.__dict__ for item in case_items]
             item_dicts = [{**item.__dict__, 'created_date': item.created_at.strftime("%B %d, %Y")} for item in case_items]
 
-            return item_dicts
+            return PaginatedItemDoctorList(
+            total=total_len,
+            items=item_dicts,
+            skip=skip,
+            limit=limit,
+        )
         elif not doctor_user_id and status:
-            case_items = db.query(self.model).filter(or_(self.model.status == status)).all()
+            query = db.query(self.model).filter(or_(self.model.status == status))
+            total_len = query.count()
+            case_items = query.offset(skip).limit(limit).all()
             print("elif case items", case_items)
         elif not status and doctor_user_id:
-            case_items = db.query(self.model).filter(self.model.doctor_user_id == doctor_user_id).all()
+            query = db.query(self.model).filter(self.model.doctor_user_id == doctor_user_id)
+            total_len = query.count()
+            case_items = query.offset(skip).limit(limit).all()
             print("elif status null items", case_items)
         else:
-            case_items = db.query(self.model). \
-                filter(and_(self.model.status == status, self.model.doctor_user_id == doctor_user_id)). \
-                all()
+            query = db.query(self.model). \
+                filter(and_(self.model.status == status, self.model.doctor_user_id == doctor_user_id))
+            total_len = query.count()
+            case_items = query.offset(skip).limit(limit).all()
             print("else case items", case_items)
 
         print("case items: ", case_items)
@@ -151,8 +164,12 @@ class CRUDCase(CRUDBase[Doctor, CaseCreate, CaseUpdate]):
                     item_dicts.append(item_dict)
                     break
         print("item_dicts: ", item_dicts)
-
-        return item_dicts
+        return PaginatedItemDoctorList(
+            total=total_len,
+            items=item_dicts,
+            skip=skip,
+            limit=limit,
+        )
 
     def get_patient_dashboard(self, db: Session, db_obj: User):
         case_pages = []

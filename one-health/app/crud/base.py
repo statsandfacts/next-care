@@ -6,6 +6,7 @@ from pydantic import UUID4, BaseModel
 from sqlalchemy.orm import Session, aliased, joinedload
 from sqlalchemy import or_, literal, not_, select, Column, String, and_
 from app.models import User, Doctor
+from app.schemas.user import PaginatedItemList
 
 # Define custom types for SQLAlchemy models, and Pydantic schemas
 ModelType = TypeVar("ModelType", bound=Base)
@@ -83,19 +84,28 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     #     return db.query(self.model).offset(skip).limit(limit).all()
 
     def get_doctors(self, db: Session, status: bool, search_name: str, skip: int = 0, limit: int = 10):
+        total_len = 0
         if not search_name:
             #items = db.query(User).filter(User.user_type == "doctor").offset(skip).limit(limit).all()
-            items = db.query(self.model).filter(and_(self.model.user_type == "2", User.is_active == status)).offset(skip).limit(limit).all()
+            query = db.query(self.model).filter(and_(self.model.user_type == "2", User.is_active == status))
+            total_len = query.count()
+            items = query.offset(skip).limit(limit).all()
             print("if items:", items)
         else:
-            items = db.query(self.model).filter(and_(User.user_type == "2", User.is_active == status,
-                                                     User.first_name.like(f'%{search_name}%'))).offset(skip).limit(
-                limit).all()
+            query = db.query(self.model).filter(and_(User.user_type == "2", User.is_active == status,
+                                                     User.first_name.like(f'%{search_name}%')))
+            total_len = query.count()
+            items = query.offset(skip).limit(limit).all()
             print("else items:", items)
         item_dicts = [item.__dict__ for item in items]
-        return item_dicts
+        return PaginatedItemList(
+            total=total_len,
+            items=item_dicts,
+            skip=skip,
+            limit=limit,
+        )
 
-    def get_items(self, db: Session, status: int, skip: int = 0, limit: int = 10) -> List[Dict]:
+    def get_items(self, db: Session, status: int, is_active: str, skip: int = 0, limit: int = 10) -> List[Dict]:
         """
         Retrieve paginated items from the database.
 
@@ -104,13 +114,14 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         :param limit: Maximum number of items to return per page
         :return: List of paginated items
         """
+        total_len = 0
         if status == 0:
             query = db.query(User).outerjoin(Doctor, User.user_id == Doctor.patient_user_id).filter(
-                User.user_type == "1")
+                User.user_type == "1", User.is_active == is_active)
 
             # Filter the results to include only those users not present in the Doctor table
             query = query.filter(or_(Doctor.patient_user_id == None, literal(False)))
-
+            total_len = query.count()
             query = query.offset(skip).limit(limit)
             items = query.all()
         elif status == 1:
@@ -121,7 +132,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
             query = (
                 db.query(User, Doctor.doctor_user_id, Doctor.status)
                 .join(Doctor, User.user_id == Doctor.patient_user_id)
-                .filter(User.user_type == "Patient")
+                .filter(User.user_type == "1", User.is_active == is_active)
                 .offset(skip)
                 .limit(limit)
             )
@@ -141,8 +152,15 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
             ]
             return item_dicts
         else:
-            items = db.query(self.model).filter(User.user_type == "Patient").offset(skip).limit(limit).all()
+            items = db.query(self.model).filter(User.user_type == "1", User.is_active == is_active).offset(skip).limit(
+                limit).all()
 
         # Convert each item to a dictionary representation
         item_dicts = [item.__dict__ for item in items]
-        return item_dicts
+
+        return PaginatedItemList(
+            total=total_len,
+            items=item_dicts,
+            skip=skip,
+            limit=limit,
+        )

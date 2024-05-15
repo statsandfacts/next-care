@@ -1,4 +1,5 @@
-import logging, json, traceback
+import logging, json, traceback, random
+import string
 from typing import Any, List, Optional
 
 from app import crud, models, schemas
@@ -15,7 +16,8 @@ from sqlalchemy.orm import Session
 from app.models.doctor import Doctor
 
 from app.schemas import UserCreate
-from app.schemas.user import UserLogin, UserLogOut, PaginatedItemList, PaginatedItemDoctorList, SaveUserResponse, GetUserResponse, PatientDashboardResponseList
+from app.schemas.user import UserLogin, UserLogOut, PaginatedItemList, PaginatedItemDoctorList, SaveUserResponse, \
+    GetUserResponse, PatientDashboardResponseList, OtpRequest
 from fastapi.responses import JSONResponse
 
 router = APIRouter(prefix="/users", tags=["users"])
@@ -28,25 +30,36 @@ def get_hello():
     return "hello"
 
 
+@router.post("/send_otp")
+def send_otp_users(request : OtpRequest):
+    verification_code = ''.join(random.sample(string.digits, k=6))
+    return JSONResponse(
+            content={"message": "Otp sent to your mail address and phone number", "status": 200,
+                     "verification_code": verification_code},
+            status_code=200)
+    #return crud.sms_service.send_otp(phone_number=request.phone_number, email_id=request.email_id)
+
+
 @router.get("", response_model=List[schemas.User])
 def read_users(
-    db: Session = Depends(deps.get_db),
-    skip: int = 0,
-    limit: int = 100,
-    current_user: models.User = Security(
-        deps.get_current_active_user,
-        scopes=[Role.ADMIN["name"], Role.SUPER_ADMIN["name"]],
-    ),
+        db: Session = Depends(deps.get_db),
+        skip: int = 0,
+        limit: int = 100,
+        current_user: models.User = Security(
+            deps.get_current_active_user,
+            scopes=[Role.ADMIN["name"], Role.SUPER_ADMIN["name"]],
+        ),
 ) -> Any:
     """
     Retrieve all users.
     """
-    users = crud.user.get_multi(db, skip=skip, limit=limit,)
+    users = crud.user.get_multi(db, skip=skip, limit=limit, )
     return users
+
 
 @router.post("/user-login")
 def user_login(user_dtl: UserLogin, db: Session = Depends(get_db)
-) -> Any:
+               ) -> Any:
     """
     log in user.
     """
@@ -74,14 +87,15 @@ def user_login(user_dtl: UserLogin, db: Session = Depends(get_db)
             )
         #save user session
         crud.user_session.createOrUpdateSession(db, session_id=user_dtl.session_id, user_id=user.user_id)
-        return JSONResponse(content={"message": "Login successful", "status": 200, "user_id": user.user_id}, status_code=200)
+        return JSONResponse(content={"message": "Login successful", "status": 200, "user_id": user.user_id},
+                            status_code=200)
     except HTTPException as e:
         return JSONResponse(content={"detail": str(e.detail), "status": e.status_code}, status_code=e.status_code)
 
 
 @router.post("/create-user")
 def create_user(user_in: UserCreate, db: Session = Depends(get_db)
-) -> Any:
+                ) -> Any:
     """
     Create new user.
     """
@@ -93,14 +107,15 @@ def create_user(user_in: UserCreate, db: Session = Depends(get_db)
                 detail="The user with this user email already exists in the system.",
             )
         user = crud.user.create(db, obj_in=user_in)
-        return JSONResponse(content={"message": "User created successfully", "status": 200, "user_id": user.user_id}, status_code=200)
+        return JSONResponse(content={"message": "User created successfully", "status": 200, "user_id": user.user_id},
+                            status_code=200)
     except HTTPException as e:
         return JSONResponse(content={"detail": str(e.detail), "status": e.status_code}, status_code=e.status_code)
 
 
 @router.post("/user-logout")
 def logout_user(user_dtl: UserLogOut, db: Session = Depends(get_db)
-) -> Any:
+                ) -> Any:
     response = JSONResponse(content={"message": "Logout successful"})
     response.delete_cookie("session_token")
     return response
@@ -108,12 +123,12 @@ def logout_user(user_dtl: UserLogOut, db: Session = Depends(get_db)
 
 @router.put("/me", response_model=schemas.User)
 def update_user_me(
-    *,
-    db: Session = Depends(deps.get_db),
-    full_name: str = Body(None),
-    phone_number: str = Body(None),
-    email: EmailStr = Body(None),
-    current_user: models.User = Depends(deps.get_current_active_user),
+        *,
+        db: Session = Depends(deps.get_db),
+        full_name: str = Body(None),
+        phone_number: str = Body(None),
+        email: EmailStr = Body(None),
+        current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Update own user.
@@ -132,8 +147,8 @@ def update_user_me(
 
 @router.get("/me", response_model=schemas.User)
 def read_user_me(
-    db: Session = Depends(deps.get_db),
-    current_user: models.User = Depends(deps.get_current_active_user),
+        db: Session = Depends(deps.get_db),
+        current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Get current user.
@@ -156,12 +171,12 @@ def read_user_me(
 
 @router.post("/open", response_model=schemas.User)
 def create_user_open(
-    *,
-    db: Session = Depends(deps.get_db),
-    password: str = Body(...),
-    email: EmailStr = Body(...),
-    full_name: str = Body(...),
-    phone_number: str = Body(None),
+        *,
+        db: Session = Depends(deps.get_db),
+        password: str = Body(...),
+        email: EmailStr = Body(...),
+        full_name: str = Body(...),
+        phone_number: str = Body(None),
 ) -> Any:
     """
     Create new user without the need to be logged in.
@@ -186,10 +201,11 @@ def create_user_open(
     user = crud.user.create(db, obj_in=user_in)
     return user
 
+
 @router.get("/patient_dashboard", response_model=PatientDashboardResponseList)
 def get_dashboard(user_id: str,
-    db: Session = Depends(deps.get_db),
-) -> Any:
+                  db: Session = Depends(deps.get_db),
+                  ) -> Any:
     try:
         user = crud.user.get(db, id=user_id)
         if not user:
@@ -200,7 +216,7 @@ def get_dashboard(user_id: str,
         casess = crud.casez.get_patient_dashboard(db, db_obj=user)
         return PatientDashboardResponseList(
             cases=casess,
-            status = 200
+            status=200
         )
     except HTTPException as e:
         return JSONResponse(content={"detail": str(e.detail), "status": e.status_code}, status_code=e.status_code)
@@ -210,11 +226,10 @@ def get_dashboard(user_id: str,
         return JSONResponse(content={"detail": "Error fetching dashboard", "status": 500}, status_code=500)
 
 
-
 @router.get("/get-user", response_model=schemas.User)
 def read_user_by_id(
-    user_id: str,
-    db: Session = Depends(deps.get_db),
+        user_id: str,
+        db: Session = Depends(deps.get_db),
 ) -> Any:
     """
     Get a specific user by id.
@@ -233,9 +248,9 @@ def read_user_by_id(
 
 @router.put("/update-user")
 def update_user(
-    *,
-    db: Session = Depends(deps.get_db),
-    user_in: schemas.UserUpdate
+        *,
+        db: Session = Depends(deps.get_db),
+        user_in: schemas.UserUpdate
 ) -> Any:
     """
     Update a user.
@@ -253,9 +268,11 @@ def update_user(
     except HTTPException as e:
         return JSONResponse(content={"detail": str(e.detail), "status": e.status_code}, status_code=e.status_code)
 
+
 @router.get("/patient-list/", response_model=PaginatedItemList)
 def get_items(
         status: int,
+        is_active: str,
         db: Session = Depends(get_db),
         page: int = Query(default=1, ge=1),
         limit: int = Query(default=10, ge=1),
@@ -264,15 +281,16 @@ def get_items(
     skip = (page - 1) * limit
 
     # Retrieve paginated items from the database
-    items = crud.user.get_items(db, status=status, skip=skip, limit=limit)
+    return crud.user.get_items(db, status=status, is_active=is_active, skip=skip, limit=limit)
 
-    # Return paginated items along with metadata
-    return PaginatedItemList(
-        total=len(items),
-        items=items,
-        skip=skip,
-        limit=limit,
-    )
+    # # Return paginated items along with metadata
+    # return PaginatedItemList(
+    #     total=len(items),
+    #     items=items,
+    #     skip=skip,
+    #     limit=limit,
+    # )
+
 
 @router.get("/doctor-list/", response_model=PaginatedItemList)
 def get_items(
@@ -286,24 +304,24 @@ def get_items(
     skip = (page - 1) * limit
 
     # Retrieve paginated items from the database
-    items = crud.user.get_doctors(db, status=status, search_name=search_name, skip=skip, limit=limit)
+    return crud.user.get_doctors(db, status=status, search_name=search_name, skip=skip, limit=limit)
 
     # Return paginated items along with metadata
-    return PaginatedItemList(
-        total=len(items),
-        items=items,
-        skip=skip,
-        limit=limit,
-    )
+    # return PaginatedItemList(
+    #     total=len(items),
+    #     items=items,
+    #     skip=skip,
+    #     limit=limit,
+    # )
 
 
 @router.get("/doctor-case-list", response_model=PaginatedItemDoctorList)
 def get_doctor_list(doctor_user_id: str,
-        status: str,
-        db: Session = Depends(get_db),
-        page: int = Query(default=1, ge=1),
-        limit: int = Query(default=10, ge=1)
-):
+                    status: str,
+                    db: Session = Depends(get_db),
+                    page: int = Query(default=1, ge=1),
+                    limit: int = Query(default=10, ge=1)
+                    ):
     # user = db.query(Doctor).filter(Doctor.doctor_user_id == doctor_user_id).first()
     # if not user:
     #     raise HTTPException(
@@ -311,22 +329,23 @@ def get_doctor_list(doctor_user_id: str,
     #         detail="The doctor is not assigned to any cases based on the filter criteria",
     #     )
     skip = (page - 1) * limit
-    items = crud.casez.get_doctor_list(db, status=status, doctor_user_id= doctor_user_id, skip=skip, limit=limit)
+    return crud.casez.get_doctor_list(db, status=status, doctor_user_id=doctor_user_id, skip=skip, limit=limit)
 
-    return PaginatedItemDoctorList(
-        total=len(items),
-        items=items,
-        skip=skip,
-        limit=limit,
-    )
+    # return PaginatedItemDoctorList(
+    #     total=len(items),
+    #     items=items,
+    #     skip=skip,
+    #     limit=limit,
+    # )
+
 
 @router.get("/get-user-responses", response_model=GetUserResponse)
 def get_user_response(user_id: str,
-session_id: Optional[str] = None,
-db: Session = Depends(get_db)):
+                      session_id: Optional[str] = None,
+                      db: Session = Depends(get_db)):
     try:
         user_session = crud.user_session.get_by_session_id_l(db, session_id=session_id,
-                                                           user_id=user_id)
+                                                             user_id=user_id)
         if not user_session:
             raise HTTPException(
                 status_code=404,
@@ -338,11 +357,11 @@ db: Session = Depends(get_db)):
 
 
 @router.post("/save-user-questionnaire")
-def save_user_response(user_response : SaveUserResponse, db: Session = Depends(get_db)
-) -> Any:
+def save_user_response(user_response: SaveUserResponse, db: Session = Depends(get_db)
+                       ) -> Any:
     try:
         user_session = crud.user_session.get_by_session_id_l(db, session_id=user_response.session_id,
-                                                           user_id=user_response.user_id)
+                                                             user_id=user_response.user_id)
         if not user_session:
             raise HTTPException(
                 status_code=404,
@@ -356,7 +375,3 @@ def save_user_response(user_response : SaveUserResponse, db: Session = Depends(g
         return JSONResponse(content={"message": "User responses captured successfully", "status": 200}, status_code=200)
     except HTTPException as e:
         return JSONResponse(content={"detail": str(e.detail), "status": e.status_code}, status_code=e.status_code)
-
-
-
-

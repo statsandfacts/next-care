@@ -201,3 +201,7 @@ class QuestionAbbreviationMapBase(BaseModel):
 
 class QuestionAbbreviationMapCreate(QuestionAbbreviationMapBase):
     pass
+
+class OtpRequest(BaseModel):
+    phone_number: str
+    email_id: Union[str, None] = None
