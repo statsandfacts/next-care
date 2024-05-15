@@ -34,3 +34,5 @@ starlette==0.36.3
 tifffile==2024.2.12
 typing_extensions==4.10.0
 uvicorn==0.27.1
+sib_api_v3_sdk>=1.23
+requests==2.31.0
