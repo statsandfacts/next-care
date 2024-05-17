@@ -47,7 +47,7 @@ async def get_all_data(db: Session = Depends(deps.get_db)):
         for item in all_records:
             key = (item.level_id, item.level_type)  # Access attributes by name
             if key in grouped_data:
-                grouped_data[key] += f", {item.allowed_value}"
+                grouped_data[key] += f",{item.allowed_value}"
             else:
                 grouped_data[key] = item.allowed_value
 
