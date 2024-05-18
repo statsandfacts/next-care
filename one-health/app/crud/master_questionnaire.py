@@ -1,10 +1,11 @@
-from app.models.master_questionnaire import MasterQuestionnaire,QuestionValue
+from app.models.master_questionnaire import MasterQuestionnaire, QuestionValue
 from fastapi import HTTPException
 from typing import List
 from sqlalchemy.orm import Session
 from app.api import deps
 from app.api.deps import get_db
 from fastapi import Depends
+
 
 def ingest_data(data, db: Session):
     try:
@@ -23,7 +24,8 @@ def ingest_data(data, db: Session):
         for value in question_values_data:
             question_value_record = QuestionValue(
                 question_id=master_questionnaire_record.question_id,
-                allowed_values=",".join(value['allowed_values'])  # Assuming allowed_values are stored as comma-separated string
+                allowed_values=",".join(value['allowed_values'])
+                # Assuming allowed_values are stored as comma-separated string
             )
             db.add(question_value_record)
 
@@ -66,18 +68,19 @@ def update_questionnaire(question_id: int, updated_data: dict, db: Session):
     if master_questionnaire:
         for key, value in updated_data['master_questionnaire'].items():
             setattr(master_questionnaire, key, value)
-    
+
     # Delete existing QuestionValues for the questionnaire
     db.query(QuestionValue).filter(QuestionValue.question_id == question_id).delete()
-    
+
     # Insert new QuestionValues
     for value in updated_data['question_values']:
         allowed_values = value['allowed_values']
         for allowed_value in allowed_values:
             db.add(QuestionValue(question_id=question_id, allowed_values=allowed_value))
-    
+
     db.commit()
     db.close()
+
 
 def delete_questionnaire(question_id: int, db: Session):
     # Delete associated QuestionValues
@@ -87,6 +90,7 @@ def delete_questionnaire(question_id: int, db: Session):
 
     db.commit()
     db.close()
+
 
 def get_questions_by_ids(question_ids: List[int], db: Session) -> List[dict]:
     questions = db.query(MasterQuestionnaire).filter(MasterQuestionnaire.question_id.in_(question_ids)).all()
@@ -98,7 +102,7 @@ def get_questions_by_ids(question_ids: List[int], db: Session) -> List[dict]:
             "question_id": question.question_id,
             "question_type": question.question_type,
             "allowed_values": allowed_values[0] if allowed_values else [],
-            "multiple_val_allowed":question.question_values
+            "multiple_val_allowed": question.multiple_selection_allowed
         }
         all_data.append(question_data)
     return all_data
