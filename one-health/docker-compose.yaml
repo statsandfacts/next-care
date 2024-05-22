@@ -32,7 +32,7 @@ services:
     image: nginx:alpine
     volumes:
       - ./nextcare.life:/etc/nginx/sites-available
-      - ./certificate:./
+      - ./next-care/one-health/certificate:/etc/nginx/certificate
     ports:
       - "80:80"
       - "443:443"
