@@ -7,8 +7,6 @@ services:
       dockerfile: Dockerfile  # Update with the actual name of your backend Dockerfile
     ports:
       - "8000:8000"  # Map container port 8000 to host port 8000
-    command: >
-      sudo docker run -d --name backend_container -p 8000:8000 latest-15may
     volumes:
       - ./certificate:/next-care/one-health/certificate  # Mount certificate directory for SSL
     depends_on:
