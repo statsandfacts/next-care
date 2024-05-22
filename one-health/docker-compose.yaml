@@ -4,7 +4,6 @@ services:
   backend:
     image: latest-15may  # Replace with your backend Docker image name
     build:
-      context:
       dockerfile: Dockerfile
     environment:
       MYSQLCLIENT_CFLAGS: "-I/usr/include/mysql"
@@ -21,7 +20,6 @@ services:
   frontend:
     image: frontend  # Replace with your frontend Docker image name
     build:
-      context: ./frontend
       dockerfile: Dockerfile
     volumes:
       - ./frontend:/app
