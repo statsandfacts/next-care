@@ -7,6 +7,8 @@ services:
       dockerfile: Dockerfile  # Update with the actual name of your backend Dockerfile
     ports:
       - "8000:8000"  # Map container port 8000 to host port 8000
+    command: >
+      uvicorn main:app --host 0.0.0.0 --port 8000 --ssl-keyfile=certificate/generated-private-key.txt --ssl-certfile=certificate/9a07b3ec74f104e1.crt
     volumes:
       - ./certificate:/next-care/one-health/certificate  # Mount certificate directory for SSL
     depends_on:
