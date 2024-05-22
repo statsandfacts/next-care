@@ -98,7 +98,8 @@ class CRUDDoctorTransaction(CRUDBase[Doctor_Transaction, DoctorTransactionReques
             return JSONResponse(
                 content={"detail": "order_by_direction must be either 'asc' or 'desc'", "status": 400},
                 status_code=400)
-
+        if not order_by_field:
+            order_by_field = 'updated_at'
         # Dynamically construct the order_by expression
         order_by_exp = asc(getattr(Doctor_Transaction, order_by_field)) if order_by_direction == 'asc' else desc(
             getattr(Doctor_Transaction, order_by_field))
@@ -121,7 +122,8 @@ class CRUDDoctorTransaction(CRUDBase[Doctor_Transaction, DoctorTransactionReques
             return JSONResponse(
                 content={"detail": "order_by_direction must be either 'asc' or 'desc'", "status": 400},
                 status_code=400)
-
+        if not order_by_field:
+            order_by_field = 'updated_at'
         # Dynamically construct the order_by expression
         order_by_exp = asc(getattr(Doctor_Transaction, order_by_field)) if order_by_direction == 'asc' else desc(
             getattr(Doctor_Transaction, order_by_field))
