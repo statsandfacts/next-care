@@ -21,7 +21,7 @@ services:
   frontend:
     image: frontend  # Replace with your frontend Docker image name
     build:
-      context: ./SkinWebapp_Admin
+      context: ./
       dockerfile: Dockerfile
     volumes:
       - ./frontend:/app
