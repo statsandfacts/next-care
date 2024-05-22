@@ -1,35 +1,30 @@
-version: '3.8'
+version: '3'
 
 services:
   backend:
     build:
-      context: ./  # Path to the directory containing your FastAPI backend Dockerfile
+      context: .
+      dockerfile: Dockerfile  # Update with the actual name of your backend Dockerfile
     ports:
-      - "8000:8000"  # Expose FastAPI backend on port 8000
-    networks:
-      - app-network
+      - "8000:8000"  # Map container port 8000 to host port 8000
+    volumes:
+      - ./certificate:/next-care/one-health/certificate  # Mount certificate directory for SSL
+    depends_on:
+      - skincare  # If you have a database service, replace 'database' with its name
 
   frontend:
     build:
-      context: ./frontend/SkinWebapp_Admin  # Path to the directory containing your React.js frontend Dockerfile
+      context: .
+      dockerfile: Dockerfile  # Update with the actual name of your frontend Dockerfile
     ports:
-      - "3000:80"  # Expose React.js frontend on port 3000
-    networks:
-      - app-network
+      - "3000:80"  # Map container port 80 to host port 3000
 
-  nginx:
-    image: nginx:alpine
-    volumes:
-      - ./nginx.conf:./ # Mount your Nginx config file
+  database:  # If you have a database service, define it here
+    image: mysql:latest  # Example for MySQL
     ports:
-      - "80:80"  # Expose Nginx on port 80
-      - "443:443"  # Expose Nginx on port 443 for HTTPS
-    depends_on:
-      - backend
-      - frontend
-    networks:
-      - app-network
-
-networks:
-  app-network:
-    driver: bridge
+      - "3306:3306"  # Map container port 3306 to host port 3306
+    environment:
+      MYSQL_ROOT_PASSWORD: 12345678
+      MYSQL_DATABASE: skincare
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: 12345678
