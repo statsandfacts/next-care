@@ -4,7 +4,7 @@ services:
   backend:
     image: latest-15may  # Replace with your backend Docker image name
     build:
-      context: ./backend
+      context:
       dockerfile: Dockerfile
     environment:
       MYSQLCLIENT_CFLAGS: "-I/usr/include/mysql"
