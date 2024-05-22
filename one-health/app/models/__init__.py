@@ -5,3 +5,6 @@ from .user_session import UserSession
 from .diagnosis_medicine_mapping import DiagnosisMedicineMapping
 from .diagnose_code_table import DiagnoseCodeTable
 from .QuestionAbbreviationMap import QuestionAbbreviationMap
+from .doctor_transaction import Doctor_Transaction
+from .consulting_fee import Consulting_Fee
+from .PromoCode import PromoCode

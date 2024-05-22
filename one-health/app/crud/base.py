@@ -84,7 +84,6 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     #     return db.query(self.model).offset(skip).limit(limit).all()
 
     def get_doctors(self, db: Session, status: bool, search_name: str, skip: int = 0, limit: int = 10):
-        total_len = 0
         if not search_name:
             #items = db.query(User).filter(User.user_type == "doctor").offset(skip).limit(limit).all()
             query = db.query(self.model).filter(and_(self.model.user_type == "2", User.is_active == status))

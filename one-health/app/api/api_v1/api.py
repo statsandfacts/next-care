@@ -1,4 +1,4 @@
-from app.api.api_v1.routers import cases, roles, user_roles, users, level_value_mapping, master_questionnaire, records, diagnosis_medicine
+from app.api.api_v1.routers import cases, roles, user_roles, users, level_value_mapping, master_questionnaire, records, diagnosis_medicine, promo_code
 from fastapi import APIRouter
 
 api_router = APIRouter()
@@ -11,3 +11,4 @@ api_router.include_router(level_value_mapping.router)
 api_router.include_router(master_questionnaire.router)
 api_router.include_router(records.router)
 api_router.include_router(diagnosis_medicine.router)
+api_router.include_router(promo_code.router)

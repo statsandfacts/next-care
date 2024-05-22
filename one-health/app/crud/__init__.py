@@ -5,3 +5,6 @@ from .crud_case import casez
 from .crud_session import user_session
 from .crud_diagnosis_medicine import diagnosis
 from .sms_service import send_otp
+from .crud_transactions import doctor_transaction
+from .consulting_fee_service import consulting_fee
+from .PromoCodeService import promo_code

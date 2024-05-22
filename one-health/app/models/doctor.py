@@ -41,6 +41,14 @@ class Doctor(Base):
         uselist=False
     )
 
+    doc_transaction = relationship(
+        "Doctor_Transaction",
+        back_populates="doctor",
+        primaryjoin="Doctor.case_id == Doctor_Transaction.case_id",
+        cascade="all, delete-orphan, save-update",
+        uselist=True
+    )
+
 
 def generate_case_id(session: Session) -> str:
     prefix = "NXTCR"
