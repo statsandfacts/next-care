@@ -20,8 +20,7 @@ services:
       dockerfile: Dockerfile  # Update with the actual name of your frontend Dockerfile
     ports:
       - "3000:80"  # Map container port 80 to host port 3000
-    command: >
-      sudo docker run -d --name frontend_container -p 3000:80 frontend
+
   skincare:  # If you have a database service, define it here
     image: mysql:latest  # Example for MySQL
     ports:
