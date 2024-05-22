@@ -19,7 +19,7 @@ services:
     ports:
       - "3000:80"  # Map container port 80 to host port 3000
 
-  database:  # If you have a database service, define it here
+  skincare:  # If you have a database service, define it here
     image: mysql:latest  # Example for MySQL
     ports:
       - "3306:3306"  # Map container port 3306 to host port 3306
