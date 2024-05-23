@@ -24,7 +24,7 @@ frontend:
         context: ./frontend/SkinWebapp_Admin
         dockerfile: Dockerfile_Frontend
     ports:
-        - "443:443"
+        - "3000:443"
 
   skincare:  # If you have a database service, define it here
     image: mysql:latest  # Example for MySQL
