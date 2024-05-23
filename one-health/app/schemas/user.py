@@ -164,6 +164,8 @@ class CreateDiagnosis(BaseModel):
     medicine: str
     company: str
     dosage: str
+    is_active: str
+    doctor_user_id: str
 
 class ImagePath(BaseModel):
     name: str

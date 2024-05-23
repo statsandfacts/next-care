@@ -39,6 +39,25 @@ def send_otp_users(request : OtpRequest):
             status_code=200)
     #return crud.sms_service.send_otp(phone_number=request.phone_number, email_id=request.email_id)
 
+@router.get("/verify-existing-user")
+def verify_user(phone_number: Optional[str] = None, email: Optional[str] = None, db: Session = Depends(deps.get_db)):
+    user = None
+    if email and phone_number:
+        user = crud.user.get_by_email_and_phone(db, email=email, phone_number= phone_number)
+    if not phone_number and email:
+        user = crud.user.get_by_email(db, email=email)
+    if not email and phone_number:
+        user = crud.user.get_by_email_or_phone(db, email=email, phone_number=phone_number)
+    if user:
+        return JSONResponse(
+            content={"message": "User Exists.", "status": 500},
+            status_code=500)
+    return JSONResponse(
+        content={"message": "User doesn't exist.", "status": 200, },
+        status_code=200)
+
+
+
 
 @router.get("", response_model=List[schemas.User])
 def read_users(

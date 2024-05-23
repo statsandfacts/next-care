@@ -22,3 +22,13 @@ class PromoCode(Base):
     )
     created_by = Column(CHAR(36), index=True)
     updated_by = Column(CHAR(36), index=True)
+
+    def to_dict(self):
+        return {
+            'Promo_Code': self.Promo_Code,
+            'Discount': self.Discount,
+            'Start_Date': self.Start_Date.strftime("%d-%m-%Y"),
+            'created_at': self.created_at.strftime("%d-%m-%Y"),
+            'created_by': self.created_by,
+            'updated_by': self.updated_by
+        }

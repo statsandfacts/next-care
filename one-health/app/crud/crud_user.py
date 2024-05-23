@@ -12,7 +12,7 @@ from app.models.user_role import UserRole
 from app.schemas.user import UserCreate, UserUpdate
 from pydantic.types import UUID4
 from sqlalchemy.orm import Session
-from sqlalchemy import or_
+from sqlalchemy import or_, and_
 from app.core import security
 
 logging.basicConfig(level=logging.INFO)
@@ -26,6 +26,9 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
 
     def get_by_email_or_phone(self, db: Session, *, email: str, phone_number: str) -> Optional[User]:
         return db.query(self.model).filter(or_(User.email_id == email, User.phone_number == phone_number)).first()
+
+    def get_by_email_and_phone(self, db: Session, *, email: str, phone_number: str) -> Optional[User]:
+        return db.query(self.model).filter(and_(User.email_id == email, User.phone_number == phone_number)).first()
 
     def get_by_user_id(self, db: Session, *, user_id: str) -> Optional[User]:
         return db.query(self.model).filter(User.user_id == user_id).first()
@@ -111,7 +114,7 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
             update_data = obj_in.dict(exclude_unset=True)
         #print("fewfewvrew: ", len(obj_in.password))
 
-        if len(obj_in.password) > 0 and 'new_password' in update_data:
+        if obj_in.password and len(obj_in.password) > 0 and 'new_password' in update_data:
             if not update_data["new_password"]:
                 raise HTTPException(
                     status_code=409,

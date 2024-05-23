@@ -76,9 +76,13 @@ class CRUDPromoCodeService(CRUDBase[PromoCode, UpdatePromoCodeRequest, UpdatePro
                 content={"detail": str(ie.orig), "status": 500},
                 status_code=500)
 
-    def delete_promo_code(self, db: Session, promo_code: PromoCode):
+    def delete_promo_code(self, db: Session, promo_code: str):
         try:
-            db.delete(promo_code)
+            promo_code_db = db.query(PromoCode).filter(PromoCode.Promo_Code == promo_code).first()
+            if not promo_code_db:
+                return JSONResponse(
+                    content={"details": "The promocode you trying to delete doesn't exist.", "status": 500}, status_code=500)
+            db.delete(promo_code_db)
             db.commit()
             return JSONResponse(
                 content={"details": "Promocode has been successfully deleted", "status": 200}, status_code=200)

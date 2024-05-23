@@ -37,5 +37,4 @@ def update_promo_code(obj_in: UpdatePromoCodeRequest, db: Session = Depends(get_
 
 @router.delete("/delete-promo-code")
 def delete_promo_code(promo_code: str, db: Session = Depends(get_db)):
-    db_promo_code = crud.promo_code.get_promo_code(promo_code)
-    return crud.promo_code.delete_promo_code(db, db_promo_code)
+    return crud.promo_code.delete_promo_code(db, promo_code=promo_code)

@@ -29,6 +29,8 @@ class CRUDConsultingFee(CRUDBase[Consulting_Fee, CreateFeeRequest, UpdateFeeRequ
                 new_fee.user_type = obj_in.user_type
                 new_fee.created_by = obj_in.created_by
                 new_fee.updated_by = obj_in.updated_by
+                new_fee.seal_stamp = obj_in.seal_stamp
+                new_fee.signature = obj_in.signature
                 db.add(new_fee)
                 db.commit()
                 db.refresh(new_fee)

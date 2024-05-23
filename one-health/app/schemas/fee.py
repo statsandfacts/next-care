@@ -10,6 +10,8 @@ class CreateFeeRequest(BaseModel):
     user_type: str
     created_by: str
     updated_by: str
+    seal_stamp: str
+    signature: str
 
 class UpdateFeeRequest(CreateFeeRequest):
     pass

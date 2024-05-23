@@ -8,3 +8,4 @@ from .QuestionAbbreviationMap import QuestionAbbreviationMap
 from .doctor_transaction import Doctor_Transaction
 from .consulting_fee import Consulting_Fee
 from .PromoCode import PromoCode
+from .tax import Tax

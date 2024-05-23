@@ -28,6 +28,8 @@ def read_mapping(mapping_id: str, db: Session = Depends(get_db)):
             "medicine": mapping.medicine,
             "company": mapping.company,
             "dosage": mapping.dosage,
+            "is_active": mapping.is_active,
+            "doctor_user_id": mapping.doctor_user_id
         }
         return JSONResponse(content={"mappings": mapped_dict, "status": 200}, status_code=200)
         #return mapping
@@ -47,6 +49,8 @@ def read_all_mappings(db: Session = Depends(get_db)):
             "medicine": mapping.medicine,
             "company": mapping.company,
             "dosage": mapping.dosage,
+            "is_active": mapping.is_active,
+            "doctor_user_id": mapping.doctor_user_id
         }
         mapped_dicts.append(mapped_dict)
     return JSONResponse(content={"mappings": mapped_dicts, "status": 200}, status_code=200)
@@ -61,12 +65,14 @@ def read_all_mappings(db: Session = Depends(get_db)):
 @router.post("/mapping")
 def create_mapping(diagnose_details: CreateDiagnosis, db: Session = Depends(get_db)
 ) -> Any:
-    try:
-        crud.diagnosis.create_mapping(db, diagnose_details.visit, diagnose_details.diagnosis, diagnose_details.medicine,
-                                      diagnose_details.company, diagnose_details.dosage)
-        return JSONResponse(content={"message": "mapping created successfully", "status": 200}, status_code=200)
-    except Exception as ex:
-        return JSONResponse(content={"detail": "Error while creating mapping", "status": 500}, status_code=500)
+    return crud.diagnosis.create_mapping(db, diagnose_details.visit, diagnose_details.diagnosis, diagnose_details.medicine,
+                                      diagnose_details.company, diagnose_details.dosage, diagnose_details.is_active, diagnose_details.doctor_user_id)
+    # try:
+    #     crud.diagnosis.create_mapping(db, diagnose_details.visit, diagnose_details.diagnosis, diagnose_details.medicine,
+    #                                   diagnose_details.company, diagnose_details.dosage, diagnose_details.is_active, diagnose_details.doctor_user_id)
+    #     return JSONResponse(content={"message": "mapping created successfully", "status": 200}, status_code=200)
+    # except Exception as ex:
+    #     return JSONResponse(content={"detail": "Error while creating mapping", "status": 500}, status_code=500)
 
 
 

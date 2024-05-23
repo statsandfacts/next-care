@@ -17,6 +17,8 @@ class Consulting_Fee(Base):
     fee = Column(DECIMAL(10, 2), index=True)
     commission = Column(DECIMAL(5, 2), index=True)
     user_type = Column(String(20), index=True)
+    signature = Column(String(100))
+    seal_stamp = Column(String(100))
     created_at = Column(
         TIMESTAMP(timezone=True),
         server_default=func.now()
@@ -36,5 +38,7 @@ class Consulting_Fee(Base):
             "commission": self.commission,
             "user_type": self.user_type,
             "created_by": self.created_by,
-            "updated_by": self.updated_by,
+            "signature": self.signature,
+            "seal_stamp": self.seal_stamp,
+            "updated_by": self.updated_by
         }

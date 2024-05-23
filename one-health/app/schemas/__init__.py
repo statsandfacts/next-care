@@ -6,3 +6,4 @@ from .user_role import UserRole, UserRoleCreate, UserRoleInDB, UserRoleUpdate
 from .case import CaseCreate, CaseUpdate
 from .doctor_txn import DoctorTransactionRequest, DoctorTransactionResponse, UpdateDoctorTransactionRequest, DoctorTransaction, PaginationDoctorTxns
 from .fee import CreateFeeRequest, UpdateFeeRequest, UpdatePromoCodeRequest
+from .tax import Tax, TaxInDBBase, TaxUpdate, TaxCreate, TaxBase
