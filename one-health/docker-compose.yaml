@@ -19,12 +19,21 @@ services:
     #ports:
      # - "3000:80"  # Map container port 80 to host port 3000
 
-  frontend:
+  frontend1:
     build:
       context: ./frontend/SkinWebapp_Admin
       dockerfile: Dockerfile_Frontend
     ports:
       - "3000:80"
+    volumes:
+      - ./certificate:/next-care/one-health/certificate  # Mount certificate directory for SSL
+
+  frontend2:
+    build:
+      context: ./frontend/SkinWebApp_frontend
+      dockerfile: Dockerfile_Frontend2
+    ports:
+      - "3001:80"
     volumes:
       - ./certificate:/next-care/one-health/certificate  # Mount certificate directory for SSL
 
