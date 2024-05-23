@@ -25,6 +25,8 @@ services:
       dockerfile: Dockerfile_Frontend
     ports:
       - "443:443"
+    volumes:
+      - ./certificate:/next-care/one-health/certificate  # Mount certificate directory for SSL
 
   skincare:  # If you have a database service, define it here
     image: mysql:latest  # Example for MySQL
