@@ -24,7 +24,7 @@ services:
       context: ./frontend/SkinWebapp_Admin
       dockerfile: Dockerfile_Frontend
     ports:
-      - "3000:443"
+      - "3000:80"
     volumes:
       - ./certificate:/next-care/one-health/certificate  # Mount certificate directory for SSL
 
