@@ -17,7 +17,7 @@ services:
       context: ./frontend/SkinWebapp_Admin
       dockerfile: Dockerfile_Frontend  # Update with the actual name of your frontend Dockerfile
     ports:
-      - "80:80"  # Map container port 80 to host port 3000
+      - "3000:80"  # Map container port 80 to host port 3000
 
   skincare:  # If you have a database service, define it here
     image: mysql:latest  # Example for MySQL
