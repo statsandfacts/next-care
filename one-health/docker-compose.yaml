@@ -14,7 +14,7 @@ services:
 
   user:
     build:
-      context: ./frontend/SkinWebapp_frontend
+      context: ./frontend/SkinWebApp_frontend
       dockerfile: Dockerfile # Update with the actual name of your frontend Dockerfile
     ports:
       - "3001:80"  # Map container port 80 to host port 3000
