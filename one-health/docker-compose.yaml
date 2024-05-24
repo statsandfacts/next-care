@@ -8,7 +8,7 @@ services:
     ports:
       - "8000:8000"  # Map container port 8000 to host port 8000
     volumes:
-      - ./certificate:/next-care/one-health/certificate  # Mount certificate directory for SSL
+      - ./certificate:/etc/nginx/ssl  # Mount certificate directory for SSL
     depends_on:
       - skincare  # If you have a database service, replace 'database' with its name
 
@@ -19,23 +19,14 @@ services:
     #ports:
      # - "3000:80"  # Map container port 80 to host port 3000
 
-  frontend1:
+  admin-doc:
     build:
       context: ./frontend/SkinWebapp_Admin
-      dockerfile: Dockerfile_Frontend
+      dockerfile: Dockerfile
     ports:
       - "3000:80"
     volumes:
-      - ./certificate:/next-care/one-health/certificate  # Mount certificate directory for SSL
-
-  frontend2:
-    build:
-      context: ./frontend/SkinWebApp_frontend
-      dockerfile: Dockerfile_Frontend2
-    ports:
-      - "3001:80"
-    volumes:
-      - ./certificate:/next-care/one-health/certificate  # Mount certificate directory for SSL
+      - ./certificate:/etc/nginx/ssl  # Mount certificate directory for SSL
 
   skincare:  # If you have a database service, define it here
     image: mysql:latest  # Example for MySQL
