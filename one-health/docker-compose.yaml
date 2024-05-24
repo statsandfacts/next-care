@@ -12,12 +12,14 @@ services:
     depends_on:
       - skincare  # If you have a database service, replace 'database' with its name
 
-  #frontend:
-    #build:
-      #context: ./frontend/SkinWebapp_Admin
-     # dockerfile: Dockerfile_Frontend  # Update with the actual name of your frontend Dockerfile
-    #ports:
-     # - "3000:80"  # Map container port 80 to host port 3000
+  user:
+    build:
+      context: ./frontend/SkinWebApp_Frontend
+      dockerfile: Dockerfile # Update with the actual name of your frontend Dockerfile
+    ports:
+      - "3001:80"  # Map container port 80 to host port 3000
+    volumes:
+      - ./certificate:/etc/nginx/ssl
 
   admin-doc:
     build:
