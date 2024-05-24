@@ -138,7 +138,7 @@ def get_doctor_txns(user_id: str, order_by_field: Optional[str] = 'updated_at',
 
 
 @router.get("/transaction/get-case-transactions", response_model=PaginationDoctorTxns)
-def get_case_txns(case_id: str, order_by_field: Optional[str] = 'updated_at',
+def get_case_txns(case_id: Optional[str] = None, order_by_field: Optional[str] = 'updated_at',
                   order_by_direction: Optional[str] = 'asc',
                   db: Session = Depends(get_db),
                   page: int = Query(default=1, ge=1),

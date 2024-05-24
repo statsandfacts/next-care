@@ -24,7 +24,7 @@ class DoctorTransaction(BaseModel):
     amount: Union[str, None] = None
     created_by: Union[str, None] = None
     paid_type: Union[str, None] = None
-    updated_by: Union[datetime, None] = None
+    updated_by: Union[str, None] = None
     created_at: Union[datetime, None] = None
 
 

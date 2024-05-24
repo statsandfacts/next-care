@@ -89,7 +89,8 @@ class CRUDDoctorTransaction(CRUDBase[Doctor_Transaction, DoctorTransactionReques
         logger.info("Updated doctor transaction")
         return updated_case
 
-    def get_doc_txn_per_id(self, db: Session, user_id: str, skip: int = 0, limit: int = 10, order_by_field: str = 'updated_at',
+    def get_doc_txn_per_id(db: Session, user_id: str, skip: int = 0, limit: int = 10,
+                           order_by_field: str = 'updated_at',
                            order_by_direction: str = 'asc'):
         # Validate order_by_direction to ensure it's either 'asc' or 'desc'
         print("order_by_field: ", order_by_field)
@@ -115,8 +116,9 @@ class CRUDDoctorTransaction(CRUDBase[Doctor_Transaction, DoctorTransactionReques
             limit=limit,
         )
 
-    def get_doc_txn_per_case(self, db: Session, case_id: str, skip: int = 0, limit: int = 10, order_by_field: str = 'updated_at',
-                           order_by_direction: str = 'asc'):
+    def get_doc_txn_per_case(self, db: Session, case_id: str, skip: int = 0, limit: int = 10,
+                             order_by_field: str = 'updated_at',
+                             order_by_direction: str = 'asc'):
         # Validate order_by_direction to ensure it's either 'asc' or 'desc'
         if order_by_direction not in ['asc', 'desc']:
             return JSONResponse(
@@ -127,8 +129,11 @@ class CRUDDoctorTransaction(CRUDBase[Doctor_Transaction, DoctorTransactionReques
         # Dynamically construct the order_by expression
         order_by_exp = asc(getattr(Doctor_Transaction, order_by_field)) if order_by_direction == 'asc' else desc(
             getattr(Doctor_Transaction, order_by_field))
+        if not case_id:
+            query = db.query(Doctor_Transaction).order_by(order_by_exp)
+        else:
+            query = db.query(Doctor_Transaction).filter(Doctor_Transaction.case_id == case_id).order_by(order_by_exp)
 
-        query = db.query(Doctor_Transaction).filter(Doctor_Transaction.case_id == case_id).order_by(order_by_exp)
         total_len = query.count()
         doc_txns = query.offset(skip).limit(limit).all()
         item_dicts = [item.__dict__ for item in doc_txns]
